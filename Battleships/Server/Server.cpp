@@ -1,6 +1,6 @@
 #define WIN32_LEAN_AND_MEAN
 
-#include "ServerCommands.h"
+#include "NetworkCommands.h"
 #include "UserFunctions.h"
 
 #pragma comment (lib, "Ws2_32.lib")
@@ -10,7 +10,7 @@
 
 #define SERVER_PORT 27016
 #define BUFFER_SIZE 256
-#define MAX_CLIENTS 3
+#define MAX_CLIENTS 10
 
 // TCP server that use non-blocking sockets
 int main()
@@ -180,59 +180,60 @@ int main()
 			// Check if new message is received from client on position "i"
 			if (FD_ISSET(clientSockets[i], &readfds))
 			{
-				iResult = recv(clientSockets[i], dataBuffer, BUFFER_SIZE, 0);
-
-				if (iResult > 0)
+				int len;
+				iResult = RecievePacket(clientSockets[i], (char*)&len, 4);
+				if (iResult != 1)
 				{
-					dataBuffer[iResult] = '\0';
-					
-
-					if (dataBuffer[0] == REGISTER) //
+					if (iResult == -1)
 					{
-						register_command *command = (register_command*)(dataBuffer);
-						bool reg = register_user(command->user);
-						if (reg)
-						{
-							printf("Succes. New user added. \n");
-						}
-						else
-						{
-							printf("Error while registrating user.\n");
-						}
+						printf("Recieved more bytes than intended.\n");
 					}
-
-
+					else
+					{
+						printf("Error while getting packets. Error Code: %d\n", iResult);
+						closesocket(clientSockets[i]);
+						WSACleanup();
+						return 1;
+					}
 				}
-				else if (iResult == 0)
+				printf("Duzina: %d \n", len);
+				char *recvBuffer = (char*)malloc(len + 1);
+				memset(recvBuffer, 0, 1);
+				iResult = RecievePacket(clientSockets[i], recvBuffer, len);
+				if (iResult != 1)
 				{
-					// connection was closed gracefully
-					printf("Connection with client (%d) closed.\n", i + 1);
-					closesocket(clientSockets[i]);
-
-					// sort array and clean last place
-					for (int j = i; j < lastIndex - 1; j++)
+					if (iResult == -1)
 					{
-						clientSockets[j] = clientSockets[j + 1];
+						printf("Recieved more bytes than intended.\n");
 					}
-					clientSockets[lastIndex - 1] = 0;
-
-					lastIndex--;
+					else
+					{
+						printf("Error while getting packets. Error Code: %d\n", iResult);
+						closesocket(clientSockets[i]);
+						WSACleanup();
+						return 1;
+					}
 				}
-				else
+				//handle user message
+				if (recvBuffer[0] == REGISTER) //
 				{
-					// there was an error during recv
-					printf("recv failed with error: %d\n", WSAGetLastError());
-					closesocket(clientSockets[i]);
-
-					// sort array and clean last place
-					for (int j = i; j < lastIndex - 1; j++)
+					register_command *command = (register_command*)(recvBuffer);
+					bool reg = register_user(command->user);
+					if (reg)
 					{
-						clientSockets[j] = clientSockets[j + 1];
+						printf("Succes. New user added. \n");
 					}
-					clientSockets[lastIndex - 1] = 0;
-
-					lastIndex--;
+					else
+					{
+						printf("Error while registrating user.\n");
+					}
 				}
+				else if (recvBuffer[0] == LOGIN)
+				{
+					printf("User successfully logged in.\n");
+				}
+				free(recvBuffer);
+				// here is where server shutdown loguc could be placed
 			}
 		}
 	}

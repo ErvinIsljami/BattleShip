@@ -1,8 +1,5 @@
 #pragma once
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <conio.h>
+#include "NetworkCommands.h"
 
 #pragma warning (disable:4996)
 
@@ -14,6 +11,29 @@ typedef struct user_st
 	char username[15];
 	char password[15];
 }USER;
+
+typedef struct player_st
+{
+	USER user;
+	SOCKET socket;
+	int index;
+	int mode;	//je rezim igranja, 1 za solo, 2 za duo
+	bool is_playing;
+}PLAYER;
+
+typedef struct single_st
+{
+	PLAYER player;
+	//ovde cemo posle da dodajemo sta nam treba
+}SINGLE_PLAYER;
+
+typedef struct multi_st
+{
+	PLAYER player1;
+	PLAYER player2;
+	//kasnije
+}MULTI_PLAYER;
+
 
 FILE *safe_fopen(char *file_name, char *mode, int err)
 {

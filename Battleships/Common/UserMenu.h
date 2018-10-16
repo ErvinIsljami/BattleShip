@@ -1,5 +1,6 @@
 #pragma once
-#include "ServerCommands.h"
+#include "NetworkCommands.h"
+char USER_NAME[15];
 bool new_user(SOCKET socket);
 bool log_in(SOCKET socket);
 int user_menu(SOCKET socket);
@@ -34,7 +35,7 @@ int user_menu(SOCKET socket)
 		}
 		else {
 			system("CLS");
-			printf("Incorrect choice. Put 0, 1 or 2!\n");
+			printf("Incorrect choice. \n");
 			getchar();
 		}
 	} while (izbor > 2 || izbor < 0);
@@ -58,32 +59,28 @@ bool new_user(SOCKET socket)
 	printf("Input password: ");
 	scanf("%s", command.user.password);
 
-	int iResult = send(socket, (char*)(&command), sizeof(register_command), 0);
-
-	// Check result of send function
-	if (iResult == SOCKET_ERROR)
-	{
-		printf("send failed with error: %d\n", WSAGetLastError());
-		closesocket(socket);
-		WSACleanup();
-		return 1;
-	}
-
+	int len = sizeof(register_command);
+	SendPacket(socket, (char*)(&len), 4);
+	SendPacket(socket, (char*)(&command), sizeof(register_command));
 
 	return true;
 }
 
 
-
 bool log_in(SOCKET socket)
 {
-	
-	char username[10], password[10];
+	login_command command;
 
+	command.command_id = LOGIN;
 	printf("Username : ");
-	scanf("%s", username);
+	scanf("%s", command.uname);
 	printf("Password: ");
-	scanf("%s", password);
+	scanf("%s", command.pass);
+	strcpy(USER_NAME, command.uname);
+
+	int len = sizeof(register_command);
+	SendPacket(socket, (char*)(&len), 4);
+	SendPacket(socket, (char*)(&command), sizeof(register_command));
 
 	
 	return true;
