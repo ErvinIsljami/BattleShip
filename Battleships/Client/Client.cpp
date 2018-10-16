@@ -1,6 +1,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include "UserMenu.h"
+#include "Drawing.h"
 
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
@@ -72,6 +73,7 @@ int main()
 
 
 	user_menu(connectSocket);
+	game_menu(connectSocket);
 
 	#pragma region Igranje
 
@@ -98,7 +100,7 @@ int main()
 		printf("Message successfully sent. Total bytes: %ld\n", iResult);
 
 		printf("\nPress 'x' to exit or any other key to continue: ");
-		if (getch() == 'x')
+		if (getchar() == 'x')
 			break;
 	}
 

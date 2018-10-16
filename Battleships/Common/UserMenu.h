@@ -1,5 +1,7 @@
 #pragma once
 #include "NetworkCommands.h"
+#include "Drawing.h"
+
 char USER_NAME[15];
 bool new_user(SOCKET socket);
 bool log_in(SOCKET socket);
@@ -43,6 +45,43 @@ int user_menu(SOCKET socket)
 	return izbor;
 }
 
+int game_menu(SOCKET socket)
+{
+	int izbor = 0;
+	do
+	{
+		system("cls");
+		printf("*******************MENU*******************\n\n");
+
+		printf("Press number for action: \n");
+		printf("0. Log out.\n");
+		printf("1. Player vs Computer\n");
+		printf("2. Player vs Player\n");
+
+		scanf("%d", &izbor);
+
+		if (izbor == 1)
+		{
+			draw_table();
+		}
+		else if (izbor == 2)
+		{
+			draw_table();
+		}
+		else if (izbor == 0)
+		{
+			return 0;
+		}
+		else
+		{
+			system("CLS");
+			printf("Incorrect choice. \n");
+			getchar();
+		}
+	} while (izbor > 2 || izbor < 0);
+
+	return izbor;
+}
 
 
 bool new_user(SOCKET socket)

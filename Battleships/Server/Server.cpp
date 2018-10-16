@@ -222,15 +222,31 @@ int main()
 					if (reg)
 					{
 						printf("Succes. New user added. \n");
+						server_response response;
+						response.code = REGISTER_OK;
+						int len = sizeof(server_response);
+						SendPacket(clientSockets[i], (char*)(&len), 4);
+						SendPacket(clientSockets[i], (char*)(&command), sizeof(server_response));
 					}
 					else
 					{
 						printf("Error while registrating user.\n");
 					}
+					
 				}
 				else if (recvBuffer[0] == LOGIN)
 				{
-					printf("User successfully logged in.\n");
+					login_command *command = (login_command*)(recvBuffer);
+					bool log = login_user(command->uname, command->pass);
+					if (log)
+					{
+						printf("Success. User %s logged in.\n", command->uname);
+						server_response response;
+						response.code = LOGIN_OK;
+						int len = sizeof(server_response);
+						SendPacket(clientSockets[i], (char*)(&len), 4);
+						SendPacket(clientSockets[i], (char*)(&command), sizeof(server_response));
+					}
 				}
 				free(recvBuffer);
 				// here is where server shutdown loguc could be placed

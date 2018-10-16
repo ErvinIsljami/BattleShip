@@ -133,7 +133,7 @@ void draw_bottom_side()
 {
 	printf("  ");
 	for (int i = 0; i < 10; i++)
-		fputs(BOX_DUD " 1 ", stdout);
+		fputs(BOX_DUD "   ", stdout);
 	fputs(BOX_DUD "\n", stdout);
 
 	printf("   ");
