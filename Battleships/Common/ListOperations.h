@@ -2,19 +2,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define _WIN32_WINNT_WIN10                  0x0A00 // Windows 10  
+#define _WIN32_WINNT_WIN10    0x0A00 // Windows 10  
+#include <assert.h>
+
+typedef struct field_st
+{
+	int row;
+	int column;
+	int state;
+}FIELD;
+
 typedef struct list_el
 {
-	int value;
+	FIELD value;
 	struct list_el* next;
 }LIST;
+
+
 int GetSize(LIST * head);
-void PushBack(LIST **head, int newValue);
-void PushFront(LIST **head, int newValue);
+void PushBack(LIST **head, FIELD newValue);
+void PushFront(LIST **head, FIELD newValue);
 void ClearList(LIST **head);
 void PrintList(LIST * head);
-char *SerializeList(LIST * head);
+//char *SerializeList(LIST * head);
 LIST *DeserializeList(char * buffer);
+void serializeList(LIST *head, char *buffer);
+void* list_to_array(LIST* list);
+FIELD GetNth(struct list_el* head, int index);
+bool searchValue(LIST **head, int rowKey, int columnKey);
+
 int GetSize(LIST * head)
 {
 	int i = 0;
@@ -26,11 +42,13 @@ int GetSize(LIST * head)
 	}
 	return i;
 }
-void PushBack(LIST **head, int newValue)
+
+void PushBack(LIST **head, FIELD newValue)
 {
 	LIST * new_el = (LIST*)malloc(sizeof(LIST));
 	new_el->next = NULL;
 	new_el->value = newValue;
+
 	if (*head == NULL)
 	{
 		*head = new_el;
@@ -46,13 +64,15 @@ void PushBack(LIST **head, int newValue)
 		temp->next = new_el;
 	}
 }
-void PushFront(LIST **head, int newValue)
+
+void PushFront(LIST **head, FIELD newValue)
 {
 	LIST * new_el = (LIST*)malloc(sizeof(LIST));
 	new_el->next = *head;
 	new_el->value = newValue;
 	*head = new_el;
 }
+
 void ClearList(LIST **head)
 {
 	if (head == NULL)
@@ -70,17 +90,21 @@ void ClearList(LIST **head)
 		}
 	}
 }
+
 void PrintList(LIST * head)
 {
 	printf("List: ");
 	LIST * temp = head;
-	while (temp->next != NULL)
+	while (temp != NULL)
 	{
-		printf("%d -> ", temp->value);
+		printf("%d, ", temp->value.column);
+		printf("%d, ", temp->value.row);
+		printf("%d, \n", temp->value.state);
 		temp = temp->next;
 	}
-	printf("%d \n", temp->value);
+
 }
+
 //char *SerializeList(LIST * head)
 //{
 //	int n = GetSize(head);
@@ -95,6 +119,7 @@ void PrintList(LIST * head)
 //		i++;
 //	}
 //}
+
 LIST *DeserializeList(char * buffer)
 {
 	int n = *((int*)buffer);
@@ -102,37 +127,50 @@ LIST *DeserializeList(char * buffer)
 	LIST *head = NULL;
 	for (i = 0; i < n; i++)
 	{
-		PushBack(&head, *((int*)(buffer + 4) + i));
+		//PushBack(&head, *((int*)(buffer + 4) + i));
 	}
+
 	return head;
 }
-int Pop(LIST **head)
+
+FIELD Pop(LIST **head)
 {
-	int retval = -1;
+	FIELD retVal;
+	retVal.column = -1;
+	retVal.row = -1;
+	retVal.state = 11;
+
 	LIST * next_node = NULL;
 	if (*head == NULL)
 	{
-		return -1;
+		return retVal;
 	}
 	next_node = (*head)->next;
-	retval = (*head)->value;
+	retVal = (*head)->value;
 	free(*head);
 	*head = next_node;
-	return retval;
+
+	return retVal;
 }
+
 void DeleteFirstElement(LIST **head)
 {
+
 	LIST * next_node = NULL;
+
 	if (*head == NULL)
 	{
 		printf("List is empty\n");
 		return;
 	}
+
 	next_node = (*head)->next;
 	free(*head);
 	*head = next_node;
+
 	return;
 }
+
 void RemoveLast(LIST *head)
 {
 	if (head->next == NULL)
@@ -140,35 +178,50 @@ void RemoveLast(LIST *head)
 		printf("Deleting the only element in list");
 		free(head);
 	}
+
 	LIST * current = head;
 	while (current->next->next != NULL)
 	{
 		current = current->next;
 	}
+
 	free(current->next);
 	current->next = NULL;
 }
-int RemoveByIndex(LIST ** head, int n) {
+
+FIELD RemoveByIndex(LIST ** head, int n) {
 	int i = 0;
-	int retval = -1;
+
+	FIELD retVal;
+	retVal.column = -1;
+	retVal.row = -1;
+	retVal.state = 2;
+
 	LIST * current = *head;
 	LIST * temp_node = NULL;
+
 	if (n == 0) {
 		return Pop(head);
 	}
+
 	for (i = 0; i < n - 1; i++) {
 		if (current->next == NULL) {
-			return -1;
+			return retVal;
 		}
 		current = current->next;
 	}
+
 	temp_node = current->next;
-	retval = temp_node->value;
+
+	retVal = temp_node->value;
 	current->next = temp_node->next;
 	free(temp_node);
-	return retval;
+
+	return retVal;
+
 }
-bool search_value(LIST **head, int value)
+
+bool searchValue(LIST **head, int rowKey, int columnKey)
 {
 	LIST* temp;
 	if ((*head) == NULL)
@@ -180,14 +233,46 @@ bool search_value(LIST **head, int value)
 		temp = (*head);
 		while (temp != NULL)
 		{
-			if (temp->value == value)
+			if (temp->value.row == rowKey && temp->value.column == columnKey)
 			{
 				printf("FOUND\n");
 				return true;
 			}
+
 			temp = temp->next;
 		}
 		printf("NOT FOUND\n");
 		return false;
 	}
 }
+
+FIELD GetNth(struct list_el* head, int index)
+{
+	struct list_el* current = head;
+	int count = 0;
+
+	while (current != NULL)
+	{
+		if (count == index)
+			return(current->value);
+		count++;
+		current = current->next;
+	}
+	//assert(0);
+}
+
+void* list_to_array(LIST* list)
+{
+	int i;
+	int array_size = GetSize(list);
+
+	FIELD* array = (FIELD*)malloc(sizeof(FIELD*) * array_size);
+
+	for (i = 0; i < array_size; i++)
+	{
+		array[i] = GetNth(list, i);
+	}
+
+	return array;
+}
+
