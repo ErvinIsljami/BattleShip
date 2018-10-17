@@ -73,35 +73,44 @@ int main()
 
 
 	user_menu(connectSocket);
-	game_menu(connectSocket);
-
-	#pragma region Igranje
-
-
-	//za igranje igrice
-
-	while (true)
+	int game_mode = game_menu(connectSocket);
+	bool is_won = false;
+	if (game_mode == 0)
 	{
-		// Read string from user into outgoing buffer
-		gets_s(dataBuffer, BUFFER_SIZE);
+		// logging out
+		iResult = shutdown(connectSocket, SD_BOTH);
 
-		// Send message to server using connected socket
-		iResult = send(connectSocket, dataBuffer, (int)strlen(dataBuffer), 0);
-
-		// Check result of send function
+		// Check if connection is succesfully shut down.
 		if (iResult == SOCKET_ERROR)
 		{
-			printf("send failed with error: %d\n", WSAGetLastError());
+			printf("Shutdown failed with error: %d\n", WSAGetLastError());
 			closesocket(connectSocket);
 			WSACleanup();
 			return 1;
 		}
 
-		printf("Message successfully sent. Total bytes: %ld\n", iResult);
+		Sleep(1000);
 
-		printf("\nPress 'x' to exit or any other key to continue: ");
-		if (getchar() == 'x')
-			break;
+		// Close connected socket
+		closesocket(connectSocket);
+
+		// Deinitialize WSA library
+		WSACleanup();
+	}
+	else
+	{
+		is_won = play_game(connectSocket);
+	}
+
+	if (is_won)
+	{
+		system("cls");
+		printf("********CONGRATULATIONS********\n");
+	}
+	else
+	{
+		system("cls");
+		printf("********PUSSY ASS NIGGA********\n");
 	}
 
 	// Shutdown the connection since we're done
@@ -123,6 +132,6 @@ int main()
 
 	// Deinitialize WSA library
 	WSACleanup();
-#pragma endregion
+
 	return 0;
 }

@@ -226,7 +226,7 @@ int main()
 						response.code = REGISTER_OK;
 						int len = sizeof(server_response);
 						SendPacket(clientSockets[i], (char*)(&len), 4);
-						SendPacket(clientSockets[i], (char*)(&command), sizeof(server_response));
+						SendPacket(clientSockets[i], (char*)(&response), sizeof(server_response));
 					}
 					else
 					{
