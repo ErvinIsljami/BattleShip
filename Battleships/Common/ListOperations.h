@@ -275,3 +275,40 @@ void* list_to_array(LIST* list)
 	return array;
 }
 
+void shootField(LIST **head, int row, int column) //pretazuje listu po row&column, ako nadje element na toj poziciji, promeni state iz 0 u 1, a ako ga ne nadje, dodaje novo polje sa state = -1
+{
+	LIST* temp;
+	int count = 0;
+
+	FIELD listField;
+	bool nadjen = false;
+
+	if ((*head) == NULL)
+	{
+		printf("The list is empty\n");
+	}
+	else
+	{
+		temp = (*head);
+		while (temp != NULL)
+		{
+			if (temp->value.row == row && temp->value.column == column)
+			{
+				temp->value.state = 1;
+				nadjen = true;
+			}
+			temp = temp->next;
+
+		}
+
+		if (nadjen == false)
+		{
+			FIELD novi;
+			novi.row = row;
+			novi.column = column;
+			novi.state = -1;
+
+			PushBack(head, novi);
+		}
+	}
+}
