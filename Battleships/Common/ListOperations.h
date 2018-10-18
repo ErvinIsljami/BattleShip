@@ -29,7 +29,7 @@ LIST *DeserializeList(char * buffer);
 void serializeList(LIST *head, char *buffer);
 void* list_to_array(LIST* list);
 FIELD GetNth(struct list_el* head, int index);
-bool searchValue(LIST **head, int rowKey, int columnKey);
+int searchValue(LIST *head, int rowKey, int columnKey);
 
 int GetSize(LIST * head)
 {
@@ -221,29 +221,28 @@ FIELD RemoveByIndex(LIST ** head, int n) {
 
 }
 
-bool searchValue(LIST **head, int rowKey, int columnKey)
+int searchValue(LIST *head, int rowKey, int columnKey)
 {
 	LIST* temp;
-	if ((*head) == NULL)
+	if ((head) == NULL)
 	{
-		printf("The list is empty\n");
+		return 0;
 	}
 	else
 	{
-		temp = (*head);
+		temp = (head);
 		while (temp != NULL)
 		{
 			if (temp->value.row == rowKey && temp->value.column == columnKey)
 			{
-				printf("FOUND\n");
-				return true;
+				return temp->value.state;
 			}
 
 			temp = temp->next;
 		}
-		printf("NOT FOUND\n");
-		return false;
 	}
+
+	return 0;
 }
 
 FIELD GetNth(struct list_el* head, int index)

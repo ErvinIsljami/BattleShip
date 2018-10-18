@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "conio.h"
 #include "UserFunctions.h"
-
+#include "ListOperations.h"
 #pragma warning(disable : 4996)
 
 enum command_ids
@@ -81,7 +81,7 @@ int SendPacket(SOCKET socket, char * message, int messageSize)
 				{
 					return WSAGetLastError();
 				}
-
+				//printf("Poslao %s\n", message + poslao);
 				poslao += iResult;
 				msgSize -= iResult;
 				if (msgSize < 0)
@@ -121,7 +121,7 @@ int RecievePacket(SOCKET socket, char * recvBuffer, int length)
 				primio += iResult;
 				if (iResult > 0)
 				{
-					//printf("Message %s.\n", recvBuffer);
+					//printf("Primio %s\n", recvBuffer);
 				}
 				else if (iResult == 0)
 				{

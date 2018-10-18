@@ -15,9 +15,9 @@
 // TCP client that use non-blocking sockets
 int main()
 {
-	
 
-	#pragma region Connection
+
+#pragma region Connection
 
 	// Socket used to communicate with server
 	SOCKET connectSocket = INVALID_SOCKET;
@@ -74,7 +74,11 @@ int main()
 
 	user_menu(connectSocket);
 	int game_mode = game_menu(connectSocket);
+	LIST *head = NULL;
+
+
 	bool is_won = false;
+
 	if (game_mode == 0)
 	{
 		// logging out
@@ -99,7 +103,12 @@ int main()
 	}
 	else
 	{
-		is_won = play_game(connectSocket);
+		place_battleships(&head);
+		system("cls");
+		draw_table(head);
+		printf("Battleships placed. This is your battlefield. Good luck!\n");
+		getchar();
+		getchar();
 	}
 
 	if (is_won)
@@ -111,6 +120,38 @@ int main()
 	{
 		system("cls");
 		printf("********PUSSY ASS NIGGA********\n");
+	}
+
+
+
+
+#pragma region Igranje
+
+
+	//za igranje igrice
+
+	while (true)
+	{
+		// Read string from user into outgoing buffer
+		gets_s(dataBuffer, BUFFER_SIZE);
+
+		// Send message to server using connected socket
+		iResult = send(connectSocket, dataBuffer, (int)strlen(dataBuffer), 0);
+
+		// Check result of send function
+		if (iResult == SOCKET_ERROR)
+		{
+			printf("send failed with error: %d\n", WSAGetLastError());
+			closesocket(connectSocket);
+			WSACleanup();
+			return 1;
+		}
+
+		printf("Message successfully sent. Total bytes: %ld\n", iResult);
+
+		printf("\nPress 'x' to exit or any other key to continue: ");
+		if (getchar() == 'x')
+			break;
 	}
 
 	// Shutdown the connection since we're done
@@ -132,6 +173,6 @@ int main()
 
 	// Deinitialize WSA library
 	WSACleanup();
-
+#pragma endregion
 	return 0;
 }

@@ -55,7 +55,7 @@ void save_user(USER user)
 
 bool validate_user(USER user)
 {
-	
+
 
 	FILE *fp = safe_fopen(FILE_NAME, "r", 1);
 	USER temp;
@@ -101,7 +101,7 @@ bool login_user(char* uname, char* pass)
 
 	while (fscanf(fp, "%s %s %s %s", temp.name, temp.surname, temp.username, temp.password) != EOF)
 	{
-		if (strcmp(temp.username, uname) == 0 && strcmp(temp.password, pass) ==0)
+		if (strcmp(temp.username, uname) == 0 && strcmp(temp.password, pass) == 0)
 		{
 			found = true;
 			break;

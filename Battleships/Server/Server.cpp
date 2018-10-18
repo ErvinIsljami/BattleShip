@@ -196,7 +196,7 @@ int main()
 						return 1;
 					}
 				}
-				printf("Duzina: %d \n", len);
+				//printf("Duzina: %d \n", len);
 				char *recvBuffer = (char*)malloc(len + 1);
 				memset(recvBuffer, 0, 1);
 				iResult = RecievePacket(clientSockets[i], recvBuffer, len);
@@ -226,13 +226,13 @@ int main()
 						response.code = REGISTER_OK;
 						int len = sizeof(server_response);
 						SendPacket(clientSockets[i], (char*)(&len), 4);
-						SendPacket(clientSockets[i], (char*)(&response), sizeof(server_response));
+						SendPacket(clientSockets[i], (char*)(command), sizeof(server_response));
 					}
 					else
 					{
 						printf("Error while registrating user.\n");
 					}
-					
+
 				}
 				else if (recvBuffer[0] == LOGIN)
 				{
@@ -245,7 +245,7 @@ int main()
 						response.code = LOGIN_OK;
 						int len = sizeof(server_response);
 						SendPacket(clientSockets[i], (char*)(&len), 4);
-						SendPacket(clientSockets[i], (char*)(&command), sizeof(server_response));
+						SendPacket(clientSockets[i], (char*)(command), sizeof(server_response));
 					}
 				}
 				free(recvBuffer);

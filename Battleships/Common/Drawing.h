@@ -118,22 +118,44 @@ void draw_top_side()
 		fputs(BOX_DDLR BOX_DLR BOX_DLR BOX_DLR, stdout);
 	fputs(BOX_DDL "\n", stdout);
 }
-void draw_one_row()
+void draw_one_row(LIST *head, int row)
 {
+	char position;
 	for (int i = 0; i < 9; i++)
-		fputs(BOX_DUD "   ", stdout);
-	fputs(BOX_DUD "   " BOX_DUD"\n", stdout);
+	{
+		char position = ' ';
+		if (searchValue(head, row, i) == 2)
+			position = 254;
+
+		fputs(BOX_DUD, stdout);
+		printf(" %c ", position);
+	}
+	if (searchValue(head, row, 9) == 2)
+		position = 254;
+	else
+		position = ' ';
+	fputs(BOX_DUD, stdout);
+	printf(" %c ", position);
+	fputs(BOX_DUD"\n", stdout);
+
 
 	fputs("   " BOX_DUDR BOX_DLR BOX_DLR BOX_DLR, stdout);
 	for (int i = 0; i < 9; i++)
 		fputs(BOX_DUDLR BOX_DLR BOX_DLR BOX_DLR, stdout);
 	fputs(BOX_DUDL "\n", stdout);
 }
-void draw_bottom_side()
+void draw_bottom_side(LIST *head, int row)
 {
 	printf("  ");
 	for (int i = 0; i < 10; i++)
-		fputs(BOX_DUD "   ", stdout);
+	{
+		char position = ' ';
+		if (searchValue(head, row, i) == 2)
+			position = 254;
+
+		fputs(BOX_DUD, stdout);
+		printf(" %c ", position);
+	}
 	fputs(BOX_DUD "\n", stdout);
 
 	printf("   ");
@@ -143,22 +165,22 @@ void draw_bottom_side()
 	fputs(BOX_DUL "\n", stdout);
 }
 
-void draw_table()
+void draw_table(LIST *head)
 {
 	char redovi = 'A';
 
 	draw_top_side();
 	for (int i = 0; i < 9; i++)
 	{
-		printf("%c  ", redovi + i);
-		draw_one_row();
+		printf("%d  ", i);
+		draw_one_row(head, i);
 	}
-	printf("%c", redovi + 10);
-	draw_bottom_side();
+	printf("9");
+	draw_bottom_side(head, 9);
 	printf("     ");
-	for (int i = 1; i <= 10; i++)
+	for (int i = 0; i <= 9; i++)
 	{
-		printf("%d   ", i);
+		printf("%C   ", i + redovi);
 	}
 	printf("\n");
 }
