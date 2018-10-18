@@ -16,7 +16,22 @@ enum command_ids
 	LOGIN,
 	NEW_SOLO_GAME,
 	NEW_DUO_GAME,
-	NEW_MOVE
+	NEW_MOVE,
+	REGISTER_OK,
+	REGISTER_ERROR,
+	LOGIN_OK,
+	LOGIN_ERROR,
+	GAME_BEGIN,
+	GAME_END,
+	POSITIONS_OK,
+	POSITIONS_ERROR,
+	MOVE_OK,
+	MOVE_ERROR,
+	SECOND_PLAYER_MOVE,
+	MOVE_TIMEOUT,
+	GAME_OVER,
+	WINER,
+	LOSER
 }CLIENT_COMMANDS;
 
 typedef struct register_user_st
@@ -32,24 +47,14 @@ typedef struct login_user_st
 	char pass[15];
 }login_command;
 
-enum server_response_st
+typedef struct start_game_st
 {
-	REGISTER_OK = 0,
-	REGISTER_ERROR,
-	LOGIN_OK,
-	LOGIN_ERROR,
-	GAME_BEGIN,
-	GAME_END,
-	POSITIONS_OK,
-	POSITIONS_ERROR,
-	MOVE_OK,
-	MOVE_ERROR,
-	SECOND_PLAYER_MOVE,
-	MOVE_TIMEOUT,
-	GAME_OVER,
-	WINER,
-	LOSER
-}SERVER_RESPONSE_CODE;
+	char command_id;
+	char mode;
+	char *sparse_matrix;	//broj ukupno polja x velicina FIELD-a
+	int matrix_size;
+}start_command;
+
 
 struct server_response
 {

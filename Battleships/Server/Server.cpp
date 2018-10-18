@@ -245,7 +245,20 @@ int main()
 						response.code = LOGIN_OK;
 						int len = sizeof(server_response);
 						SendPacket(clientSockets[i], (char*)(&len), 4);
-						SendPacket(clientSockets[i], (char*)(command), sizeof(server_response));
+						SendPacket(clientSockets[i], (char*)(&response), sizeof(server_response));
+					}
+				}
+				else if (recvBuffer[0] == NEW_SOLO_GAME)
+				{
+					start_command *command = (start_command*)(recvBuffer);
+					FIELD *desiralized = (FIELD*)command->sparse_matrix;
+					
+
+					system("cls");
+					printf("testing serialization");
+					for (int i = 0; i < command->matrix_size; i++)
+					{
+						printf("(%d, %d) -> %d \n", desiralized[i].row, desiralized[i].column, desiralized[i].state);
 					}
 				}
 				free(recvBuffer);

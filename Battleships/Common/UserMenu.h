@@ -81,7 +81,6 @@ int game_menu(SOCKET socket)
 	return izbor;
 }
 
-
 bool new_user(SOCKET socket)
 {
 	register_command command;
@@ -103,7 +102,6 @@ bool new_user(SOCKET socket)
 	return true;
 }
 
-
 bool log_in(SOCKET socket)
 {
 	login_command command;
@@ -115,9 +113,9 @@ bool log_in(SOCKET socket)
 	scanf("%s", command.pass);
 	strcpy(USER_NAME, command.uname);
 
-	int len = sizeof(register_command);
+	int len = sizeof(login_command);
 	SendPacket(socket, (char*)(&len), 4);
-	SendPacket(socket, (char*)(&command), sizeof(register_command));
+	SendPacket(socket, (char*)(&command), sizeof(login_command));
 
 	while (true)
 	{
@@ -170,17 +168,6 @@ bool log_in(SOCKET socket)
 			return false;
 		}
 	}
-
-
-
-
-
-
-
-
-
-
-
 
 	return true;
 }
@@ -331,10 +318,35 @@ bool place_one_battleship(LIST **head, int length, char begin[], char end[])
 	return false;
 }
 
-
-
-
-bool play_game(SOCKET socket, int mode)
+bool play_game(SOCKET socket, LIST **head, int mode)
 {
+	FIELD *serialized = (FIELD*)list_to_array(*head);
+	start_command command;
+	command.command_id = NEW_SOLO_GAME;
+	command.mode = mode;
+	command.sparse_matrix = (char*)serialized;
+	command.matrix_size = GetSize(*head);
+
+	//system("cls");
+	printf("testing serialization");
+	for (int i = 0; i < command.matrix_size; i++)
+	{
+		printf("(%d, %d) -> %d \n", serialized[i].row, serialized[i].column, serialized[i].state);
+	}
+	getchar();
+
+	getchar();
+
+	int len = sizeof(start_command);
+	SendPacket(socket, (char*)(&len), 4);
+	SendPacket(socket, (char*)(&command), sizeof(start_command));
+
+
+
+
+
+
+
+
 	return false;
 }

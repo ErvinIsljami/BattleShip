@@ -1,6 +1,8 @@
 ﻿  Client.cpp
+c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.h(283): warning C4101: 'listField': unreferenced local variable
 c:\users\e324-2015\desktop\battleship\battleships\common\drawing.h(128): warning C4309: '=': truncation of constant value
 c:\users\e324-2015\desktop\battleship\battleships\common\drawing.h(134): warning C4309: '=': truncation of constant value
 c:\users\e324-2015\desktop\battleship\battleships\common\drawing.h(154): warning C4309: '=': truncation of constant value
+c:\users\e324-2015\desktop\battleship\battleships\client\client.cpp(29): warning C4101: 'dataBuffer': unreferenced local variable
 c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.h(261): warning C4715: 'GetNth': not all control paths return a value
   Client.vcxproj -> C:\Users\e324-2015\Desktop\BattleShip\Battleships\Debug\Client.exe
