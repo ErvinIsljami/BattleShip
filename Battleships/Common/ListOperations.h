@@ -4,6 +4,7 @@
 #include <string.h>
 #define _WIN32_WINNT_WIN10    0x0A00 // Windows 10  
 #include <assert.h>
+#include <time.h>
 
 typedef struct field_st
 {
@@ -18,7 +19,9 @@ typedef struct list_el
 	struct list_el* next;
 }LIST;
 
-
+LIST* load_battlefield(char *file_name);
+void save_battlefield(LIST *head);
+LIST* get_random_battlefield();
 int GetSize(LIST * head);
 void PushBack(LIST **head, FIELD newValue);
 void PushFront(LIST **head, FIELD newValue);
@@ -326,21 +329,58 @@ LIST* arrayToList(FIELD* array, int array_size)
 	return lista;
 }
 
-/*
+
 LIST* get_random_battlefield()
 {
 	//imaces fajl koji se zove number_of_battlefield.txt, u njemu cuvas ukupan broj matrica, ucitas n
 	//uzmes random broj(r) izmedju 1 i n, i koristis sprintf(file_name,"battlefield%d.txt",r);
 	//ucitas tu matricu preko load_battlefield funkcije, prosledis joj ime fajla
 	//vratis tu listu sto ti je vratila funkcija
+	
+	int n = 0;
+	srand(time(NULL));
+	char ime[20];
+
+	FILE *fp = safe_fopen("number_of_battlefield.txt", "r", 404);
+	if(fp == NULL)
+	{
+		return NULL;
+	}
+	fscanf(fp, "%d", &n);
+
+	int r = rand()%n+1;
+
+	sprintf(ime, "battlefield%d.txt", r);
+
+	return load_battlefield(ime);
 }
 
 LIST* load_battlefield(char *file_name)
 {
 	//fajl izgleda ovako: row column value
 	//imaces fajlove koji se zovu, battlefield1.txt, battlefield2.txt, battlefield3.txt, battlefield4.tx
+	FILE *fp = safe_fopen(file_name, "r", 404);
+	if(fp == NULL)
+	{
+		return NULL;
+	}
+
+	LIST* lista = NULL;
+	FIELD temp;
+	temp.column = -1;
+	temp.row = -1;
+	temp.state = 10;
+	//(LIST*)malloc(sizeof(LIST));
+
+	while(fscanf(fp,"%d %d %d", &temp.row, &temp.column, &temp.state) != EOF) 
+	{
+		PushFront(&lista, temp);
+	}
+
+	return lista;
 }
-*/
+
+
 void save_battlefield(LIST *head)
 {
 	//ucita broj n iz fajla number_of_battlefield.txt, ako ne postoji taj fajl, napravis ga i upises 0

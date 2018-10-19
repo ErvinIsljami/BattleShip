@@ -103,10 +103,11 @@ int main()
 	}
 	else
 	{
-		place_battleships(&head);
+		//place_battleships(&head);
+		head = get_random_battlefield();
 		system("cls");
 		draw_table(head);
-		save_battlefield(head);
+		//save_battlefield(head);
 		printf("Battleships placed. This is your battlefield. Good luck!\n");
 		getchar();
 		getchar();

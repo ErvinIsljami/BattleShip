@@ -1,6 +1,7 @@
 ﻿  Server.cpp
-c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.h(284): warning C4101: 'listField': unreferenced local variable
-c:\users\e324-2015\desktop\battleship\battleships\common\networkcommands.h(11): warning C4081: expected '('; found 'constant'
-c:\users\e324-2015\desktop\battleship\battleships\server\server.cpp(33): warning C4101: 'dataBuffer': unreferenced local variable
-c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.h(261): warning C4715: 'GetNth': not all control paths return a value
-  Server.vcxproj -> C:\Users\e324-2015\Desktop\BattleShip\Battleships\Debug\Server.exe
+c:\users\e3101-2015\desktop\battleship\battleships\common\listoperations.h(287): warning C4101: 'listField': unreferenced local variable
+c:\users\e3101-2015\desktop\battleship\battleships\common\listoperations.h(341): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\e3101-2015\desktop\battleship\battleships\common\networkcommands.h(11): warning C4081: expected '('; found 'constant'
+c:\users\e3101-2015\desktop\battleship\battleships\server\server.cpp(33): warning C4101: 'dataBuffer': unreferenced local variable
+c:\users\e3101-2015\desktop\battleship\battleships\common\listoperations.h(264): warning C4715: 'GetNth': not all control paths return a value
+  Server.vcxproj -> C:\Users\e3101-2015\Desktop\BattleShip\Battleships\Debug\Server.exe
