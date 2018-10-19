@@ -10,7 +10,7 @@
 
 #define SERVER_PORT 27016
 #define BUFFER_SIZE 256
-#define MAX_CLIENTS 10
+#define MAX_CLIENTS 100
 
 // TCP server that use non-blocking sockets
 int main()
@@ -18,13 +18,12 @@ int main()
 
 #pragma region Connection
 
-
-
 	// Socket used for listening for new clients 
 	SOCKET listenSocket = INVALID_SOCKET;
 
 	// Sockets used for communication with client
 	SOCKET clientSockets[MAX_CLIENTS];
+	int clients_state[MAX_CLIENTS];
 	short lastIndex = 0;
 
 	// Variable used to store function return value
@@ -114,6 +113,10 @@ int main()
 
 #pragma region Accept
 
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		clients_state[i] = 0;
+	}
 
 
 	while (true)
@@ -129,7 +132,8 @@ int main()
 
 		for (int i = 0; i < lastIndex; i++)
 		{
-			FD_SET(clientSockets[i], &readfds);
+			if(clients_state[i] == 0)
+				FD_SET(clientSockets[i], &readfds);
 		}
 
 		// wait for events on set
@@ -252,14 +256,13 @@ int main()
 				{
 					start_command *command = (start_command*)(recvBuffer);
 					FIELD *desiralized = (FIELD*)command->sparse_matrix;
-					
-
 					system("cls");
 					printf("testing serialization");
 					for (int i = 0; i < command->matrix_size; i++)
 					{
 						printf("(%d, %d) -> %d \n", desiralized[i].row, desiralized[i].column, desiralized[i].state);
 					}
+					clients_state[i] = 1;
 				}
 				free(recvBuffer);
 				// here is where server shutdown loguc could be placed

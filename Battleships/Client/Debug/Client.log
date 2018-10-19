@@ -1,5 +1,6 @@
 ﻿  Client.cpp
-c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.h(283): warning C4101: 'listField': unreferenced local variable
+c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.h(284): warning C4101: 'listField': unreferenced local variable
+c:\users\e324-2015\desktop\battleship\battleships\common\networkcommands.h(11): warning C4081: expected '('; found 'constant'
 c:\users\e324-2015\desktop\battleship\battleships\common\drawing.h(128): warning C4309: '=': truncation of constant value
 c:\users\e324-2015\desktop\battleship\battleships\common\drawing.h(134): warning C4309: '=': truncation of constant value
 c:\users\e324-2015\desktop\battleship\battleships\common\drawing.h(154): warning C4309: '=': truncation of constant value

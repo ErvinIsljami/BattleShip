@@ -27,7 +27,7 @@ void PrintList(LIST * head);
 //char *SerializeList(LIST * head);
 LIST *DeserializeList(char * buffer);
 void serializeList(LIST *head, char *buffer);
-void* list_to_array(LIST* list);
+FIELD* list_to_array(LIST* list);
 FIELD GetNth(struct list_el* head, int index);
 int searchValue(LIST *head, int rowKey, int columnKey);
 
@@ -260,12 +260,13 @@ FIELD GetNth(struct list_el* head, int index)
 	//assert(0);
 }
 
-void* list_to_array(LIST* list)
+
+FIELD* list_to_array(LIST* list)
 {
 	int i;
 	int array_size = GetSize(list);
 
-	FIELD* array = (FIELD*)malloc(sizeof(FIELD*) * array_size);
+	FIELD* array = (FIELD*)malloc(sizeof(FIELD) * array_size);
 
 	for (i = 0; i < array_size; i++)
 	{
@@ -311,4 +312,75 @@ void shootField(LIST **head, int row, int column) //pretazuje listu po row&colum
 			PushBack(head, novi);
 		}
 	}
+}
+
+LIST* arrayToList(FIELD* array, int array_size)
+{
+	LIST* lista = NULL;
+
+	for (int i = 0; i<array_size; i++)
+	{
+		PushFront(&lista, array[i]);
+	}
+
+	return lista;
+}
+
+/*
+LIST* get_random_battlefield()
+{
+	//imaces fajl koji se zove number_of_battlefield.txt, u njemu cuvas ukupan broj matrica, ucitas n
+	//uzmes random broj(r) izmedju 1 i n, i koristis sprintf(file_name,"battlefield%d.txt",r);
+	//ucitas tu matricu preko load_battlefield funkcije, prosledis joj ime fajla
+	//vratis tu listu sto ti je vratila funkcija
+}
+
+LIST* load_battlefield(char *file_name)
+{
+	//fajl izgleda ovako: row column value
+	//imaces fajlove koji se zovu, battlefield1.txt, battlefield2.txt, battlefield3.txt, battlefield4.tx
+}
+*/
+void save_battlefield(LIST *head)
+{
+	//ucita broj n iz fajla number_of_battlefield.txt, ako ne postoji taj fajl, napravis ga i upises 0
+	//napravis fajl koji se zove sprintf(file_name, "battlefield%d.txt",n+1)
+	//upises u taj fajl matricu(moras da ispostujes redosled row column value)
+	//povecas n za jedan jer si upisao jednu matricu
+	//upises n
+
+	int n = 0;
+	char ime[20];
+
+	FILE *fp2;
+	FILE *fp = safe_fopen("number_of_battlefield.txt", "r", 404);
+	if (fp == NULL)
+	{
+		fp2 = safe_fopen("number_of_battlefield.txt", "w", 1);
+		fprintf(fp2, "0");
+		fclose(fp2);
+		fp = safe_fopen("number_of_battlefield.txt", "r", 404);
+	}
+
+	fscanf(fp, "%d", &n);
+	fclose(fp);
+
+	sprintf(ime, "battlefield%d.txt", n + 1);
+	FILE *fp3 = safe_fopen(ime, "w", 1);
+
+	LIST* current = head;
+
+	while (current != NULL)
+	{
+		fprintf(fp3, "%d %d %d\n", current->value.row, current->value.column, current->value.state);
+
+		current = current->next;
+	}
+
+	fclose(fp3);
+
+	fp2 = safe_fopen("number_of_battlefield.txt", "w", 1);
+	n++;
+	fprintf(fp2, "%d", n);
+	fclose(fp2);
 }

@@ -320,18 +320,20 @@ bool place_one_battleship(LIST **head, int length, char begin[], char end[])
 
 bool play_game(SOCKET socket, LIST **head, int mode)
 {
-	FIELD *serialized = (FIELD*)list_to_array(*head);
+	FIELD *serialized = list_to_array(*head);
 	start_command command;
 	command.command_id = NEW_SOLO_GAME;
 	command.mode = mode;
-	command.sparse_matrix = (char*)serialized;
 	command.matrix_size = GetSize(*head);
-
-	//system("cls");
-	printf("testing serialization");
 	for (int i = 0; i < command.matrix_size; i++)
 	{
-		printf("(%d, %d) -> %d \n", serialized[i].row, serialized[i].column, serialized[i].state);
+		command.sparse_matrix[i] = serialized[i];
+	}
+	//system("cls");
+	printf("Testing serialization:\n");
+	for (int i = 0; i < command.matrix_size; i++)
+	{
+		printf("(%d, %d) -> %d \n", command.sparse_matrix[i].row, command.sparse_matrix[i].column, command.sparse_matrix[i].state);
 	}
 	getchar();
 

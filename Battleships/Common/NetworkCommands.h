@@ -8,7 +8,7 @@
 #include "UserFunctions.h"
 #include "ListOperations.h"
 #pragma warning(disable : 4996)
-
+#pragma pack 1
 enum command_ids
 {
 	SHUTDOWN = 0,
@@ -51,7 +51,7 @@ typedef struct start_game_st
 {
 	char command_id;
 	char mode;
-	char *sparse_matrix;	//broj ukupno polja x velicina FIELD-a
+	FIELD sparse_matrix[17];	//broj ukupno polja x velicina FIELD-a
 	int matrix_size;
 }start_command;
 

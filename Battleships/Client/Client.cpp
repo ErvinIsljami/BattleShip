@@ -106,6 +106,7 @@ int main()
 		place_battleships(&head);
 		system("cls");
 		draw_table(head);
+		save_battlefield(head);
 		printf("Battleships placed. This is your battlefield. Good luck!\n");
 		getchar();
 		getchar();
@@ -144,6 +145,7 @@ int main()
 
 	// Deinitialize WSA library
 	WSACleanup();
-
+	getchar();
+	getchar();
 	return 0;
 }
