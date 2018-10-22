@@ -124,8 +124,13 @@ void draw_one_row(LIST *head, int row)
 	for (int i = 0; i < 9; i++)
 	{
 		char position = ' ';
-		if (searchValue(head, row, i) == 2)
+		int s = searchValue(head, row, i);
+		if (s == 2)
 			position = 254;
+		else if (s == 1)
+			position = 'x';
+		else if (s == -1)
+			position = 'o';
 
 		fputs(BOX_DUD, stdout);
 		printf(" %c ", position);
@@ -150,8 +155,13 @@ void draw_bottom_side(LIST *head, int row)
 	for (int i = 0; i < 10; i++)
 	{
 		char position = ' ';
-		if (searchValue(head, row, i) == 2)
+		int s = searchValue(head, row, i);
+		if (s == 2)
 			position = 254;
+		else if (s == 1)
+			position = 'x';
+		else if (s == -1)
+			position = 'o';
 
 		fputs(BOX_DUD, stdout);
 		printf(" %c ", position);

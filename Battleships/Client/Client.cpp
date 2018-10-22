@@ -106,8 +106,8 @@ int main()
 		//place_battleships(&head);
 		head = get_random_battlefield();
 		system("cls");
-		draw_table(head);
-		//save_battlefield(head);
+		//draw_table(head);
+		save_battlefield(head);
 		printf("Battleships placed. This is your battlefield. Good luck!\n");
 		getchar();
 		getchar();
@@ -125,7 +125,6 @@ int main()
 		system("cls");
 		printf("********PUSSY ASS NIGGA********\n");
 	}
-
 
 	// Shutdown the connection since we're done
 	iResult = shutdown(connectSocket, SD_BOTH);

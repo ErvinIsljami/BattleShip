@@ -1,10 +1,14 @@
 ﻿  Client.cpp
 c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.h(287): warning C4101: 'listField': unreferenced local variable
-c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.h(341): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.h(370): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
 c:\users\e324-2015\desktop\battleship\battleships\common\networkcommands.h(11): warning C4081: expected '('; found 'constant'
-c:\users\e324-2015\desktop\battleship\battleships\common\drawing.h(128): warning C4309: '=': truncation of constant value
-c:\users\e324-2015\desktop\battleship\battleships\common\drawing.h(134): warning C4309: '=': truncation of constant value
-c:\users\e324-2015\desktop\battleship\battleships\common\drawing.h(154): warning C4309: '=': truncation of constant value
+c:\users\e324-2015\desktop\battleship\battleships\common\networkcommands.h(190): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\e324-2015\desktop\battleship\battleships\common\networkcommands.h(195): warning C4101: 'move_c': unreferenced local variable
+c:\users\e324-2015\desktop\battleship\battleships\common\drawing.h(129): warning C4309: '=': truncation of constant value
+c:\users\e324-2015\desktop\battleship\battleships\common\drawing.h(139): warning C4309: '=': truncation of constant value
+c:\users\e324-2015\desktop\battleship\battleships\common\drawing.h(160): warning C4309: '=': truncation of constant value
+c:\users\e324-2015\desktop\battleship\battleships\common\usermenu.h(333): warning C4101: 'move': unreferenced local variable
 c:\users\e324-2015\desktop\battleship\battleships\client\client.cpp(29): warning C4101: 'dataBuffer': unreferenced local variable
 c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.h(264): warning C4715: 'GetNth': not all control paths return a value
+c:\users\e324-2015\desktop\battleship\battleships\common\usermenu.h(248): warning C4715: 'validate_move': not all control paths return a value
   Client.vcxproj -> C:\Users\e324-2015\Desktop\BattleShip\Battleships\Debug\Client.exe

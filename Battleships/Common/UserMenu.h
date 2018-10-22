@@ -221,50 +221,39 @@ void place_battleships(LIST **head)
 	}
 }
 
+bool validate_move(char move[])
+{
+	if (islower(move[0]))
+	{
+		move[0] -= 32;
+	}
+	if (islower(move[1]))
+	{
+		move[1] -= 32;
+	}
+	if (move[0] <= 'J' && move[0] >= 'A')
+	{
+		char temp = move[0];
+		move[0] = move[1];
+		move[1] = temp;
+	}
+	if (move[0] > '9' || move[0] < '0')
+	{
+		return false;
+	}
+	if (move[1] < 'A' || move[1] > 'J')
+	{
+		return false;
+	}
+}
+
 bool place_one_battleship(LIST **head, int length, char begin[], char end[])
 {
-#pragma region Validate input
-	if (islower(begin[0]))
-	{
-		begin[0] -= 32;
-	}
-	if (islower(begin[1]))
-	{
-		begin[1] -= 32;
-	}
-	if (islower(end[0]))
-	{
-		end[0] -= 32;
-	}
-	if (islower(end[1]))
-	{
-		end[1] -= 32;
-	}
-	if (begin[0] <= 'J' && begin[0] >= 'A')
-	{
-		char temp = begin[0];
-		begin[0] = begin[1];
-		begin[1] = temp;
-	}
-	if (end[0] <= 'J' && end[0] >= 'A')
-	{
-		char temp = end[0];
-		end[0] = end[1];
-		end[1] = temp;
-	}
-	if (begin[0] > '9' || begin[0] < '0')
+	if (!validate_move(begin))
 	{
 		return false;
 	}
-	if (begin[1] < 'A' || begin[1] > 'J')
-	{
-		return false;
-	}
-	if (end[0] > '9' || end[0] < '0')
-	{
-		return false;
-	}
-	if (end[1] < 'A' || end[1] > 'J')
+	if (!validate_move(end))
 	{
 		return false;
 	}
@@ -280,8 +269,6 @@ bool place_one_battleship(LIST **head, int length, char begin[], char end[])
 		begin[1] = end[1];
 		end[1] = temp;
 	}
-#pragma endregion
-
 #pragma region validate move
 	if (begin[0] == end[0]) // ista horizontala
 	{
@@ -333,28 +320,53 @@ bool play_game(SOCKET socket, LIST **head, int mode)
 	{
 		command.sparse_matrix[i] = serialized[i];
 	}
-	//system("cls");
-	/*printf("Testing serialization:\n");
-	for (int i = 0; i < command.matrix_size; i++)
-	{
-		printf("(%d, %d) -> %d \n", command.sparse_matrix[i].row, command.sparse_matrix[i].column, command.sparse_matrix[i].state);
-	}*/
 
 	printf("Begin game??\n");
-	getchar();
 	getchar();
 
 	int len = sizeof(start_command);
 	SendPacket(socket, (char*)(&len), 4);
 	SendPacket(socket, (char*)(&command), sizeof(start_command));
+	//ovde krece igra...
+	system("mode con: cols=110 lines=65");
+	LIST *oponent_list = NULL;
+	char move[3];
+	system("cls");
+	while (true)
+	{
+		
+		printf("******** Oponents battlefiled ***********\n");
+		draw_table(oponent_list);
+		printf("********** My battlefiled ***************\n");
+		draw_table(*head);
+		printf("Guess field: ");
+		move_command command;
+		command.code = MOVE;
+		scanf("%s",command.move);
+		int len = sizeof(start_command);
+		//salje svoj potez serveru
+		SendPacket(socket, (char*)(&len), 4);
+		SendPacket(socket, (char*)(&command), sizeof(start_command));
 
-	getchar();
-	getchar();
-
-
-
-
-
+		int iResult = RecievePacket(socket, (char*)&len, 4);
+		char *recvBuffer = (char*)malloc(len + 1);
+		memset(recvBuffer, 0, 1);
+		iResult = RecievePacket(socket, recvBuffer, len);
+		
+		free(recvBuffer);
+		iResult = RecievePacket(socket, (char*)&len, 4);
+		recvBuffer = (char*)malloc(len + 1);
+		memset(recvBuffer, 0, 1);
+		iResult = RecievePacket(socket, recvBuffer, len);
+		printf("Server move: %s", recvBuffer);
+		changeState(&(*head), recvBuffer[0] - '0', recvBuffer[1] - 'A');
+		
+		printf("asdfasdf\n");
+		getchar();
+		getchar();
+		system("cls");
+	}
+		
 
 	return false;
 }

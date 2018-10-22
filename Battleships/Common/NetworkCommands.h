@@ -23,10 +23,9 @@ enum command_ids
 	LOGIN_ERROR,
 	GAME_BEGIN,
 	GAME_END,
-	POSITIONS_OK,
-	POSITIONS_ERROR,
-	MOVE_OK,
-	MOVE_ERROR,
+	MOVE,
+	MOVE_HIT,
+	MOVE_MISS,
 	SECOND_PLAYER_MOVE,
 	MOVE_TIMEOUT,
 	GAME_OVER,
@@ -55,12 +54,31 @@ typedef struct start_game_st
 	int matrix_size;
 }start_command;
 
-
 struct server_response
 {
 	int code;
 	char error[30];
 };
+
+typedef struct player_st
+{
+	SOCKET socket;
+	char username[10];
+	LIST *ships;
+}player;
+
+typedef struct duo_game_st
+{
+	player player_one;
+	player player_two;
+}duo_game;
+
+typedef struct player_move_command
+{
+	int code;
+	char move[3];
+
+}move_command;
 
 int SendPacket(SOCKET socket, char * message, int messageSize)
 {
@@ -156,28 +174,56 @@ int RecievePacket(SOCKET socket, char * recvBuffer, int length)
 	return 1;
 }
 
-typedef struct duo_game_st
-{
-	SOCKET player1;
-	SOCKET player2;
-	char username1[10];
-	char username2[10];
-	LIST *player1_ships;
-	LIST *player2_ships;
-}duo_game;
-
-typedef struct solo_game_st
-{
-	SOCKET player;
-	char username[10];
-	LIST *player_ships;
-};
 DWORD WINAPI duo_game_thread(LPVOID lpParam)
 {
+	while (true)
+	{
+		duo_game *data = (duo_game*)lpParam;
+		printf("Igra izmedju %s i %s pocela.\n", data->player_one.username, data->player_two.username);
 
+		Sleep(3000);
+	}
 }
 
 DWORD WINAPI solo_game_thread(LPVOID lpParam)
 {
+	srand(time(NULL));
+	player *p = (player*)lpParam;
+	printf("Player %s started game.\n", p->username);
+	while (true)
+	{
+		move_command move_c;
+		int len = sizeof(move_command);
+		//prima klijentov potez
 
+		int iResult = RecievePacket(p->socket, (char*)&len, 4);
+		char *recvBuffer = (char*)malloc(len + 1);
+		memset(recvBuffer, 0, 1);
+		iResult = RecievePacket(p->socket, recvBuffer, len);
+		
+		//provera poteza i validacija... treba implementirati da i server cita random matricu
+
+
+		//odgovara na potez
+		server_response response;
+		response.code = MOVE_MISS;
+		len = sizeof(server_response);
+		SendPacket(p->socket, (char*)(&len), 4);
+		SendPacket(p->socket, (char*)(&response), sizeof(server_response));
+
+
+
+		//pogadja potez
+		move_command command;
+		command.code = MOVE;
+		command.move[0] = rand() % 10 + '0';
+		command.move[1] = rand() % 10 + 'A';
+		command.move[2] = 0;
+		printf("Server played %s \n", command.move);
+		len = sizeof(start_command);
+		//salje svoj potez serveru
+		SendPacket(p->socket, (char*)(&len), 4);
+		SendPacket(p->socket, (char*)(&command), sizeof(move_command));
+
+	}
 }

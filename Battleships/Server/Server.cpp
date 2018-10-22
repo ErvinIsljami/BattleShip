@@ -23,7 +23,10 @@ int main()
 
 	// Sockets used for communication with client
 	SOCKET clientSockets[MAX_CLIENTS];
+	player player1;
+	player player2;
 	int clients_state[MAX_CLIENTS];
+	char client_name[10] = "default\0";
 	short lastIndex = 0;
 
 	// Variable used to store function return value
@@ -245,6 +248,7 @@ int main()
 					if (log)
 					{
 						printf("Success. User %s logged in.\n", command->uname);
+						strcpy(client_name, command->uname);
 						server_response response;
 						response.code = LOGIN_OK;
 						int len = sizeof(server_response);
@@ -256,34 +260,50 @@ int main()
 				{
 					start_command *command = (start_command*)(recvBuffer);
 					FIELD *desiralized = (FIELD*)command->sparse_matrix;
-					system("cls");
-					printf("testing serialization");
+					player game_data;
+					game_data.ships = NULL;
+					game_data.socket = clientSockets[i];
+					strcpy(game_data.username, client_name);
 					for (int j = 0; j < command->matrix_size; j++)
 					{
-						printf("(%d, %d) -> %d \n", desiralized[j].row, desiralized[j].column, desiralized[j].state);
+						PushFront(&game_data.ships, command->sparse_matrix[j]);
 					}
 					clients_state[i] = 1;
+					DWORD id;
+					HANDLE game = CreateThread(NULL, 0, &solo_game_thread, &game_data, 0, &id);
+
 				}
 				else if (recvBuffer[0] == NEW_DUO_GAME)
 				{
 					start_command *command = (start_command*)(recvBuffer);
 					FIELD *desirialized = (FIELD*)command->sparse_matrix;
-					system("cls");
+					player p;
+					p.ships = NULL;
+					p.socket = clientSockets[i];
+					strcpy(p.username, client_name);
 					for (int j = 0; j < command->matrix_size; j++)
 					{
-						printf("(%d, %d) -> %d \n", desirialized[j].row, desirialized[j].column, desirialized[j].state);
+						PushFront(&p.ships, desirialized[i]);
 					}
-					bool nasao = false;
+					bool found = false;
 					for (int j = 0; j < MAX_CLIENTS; j++)
 					{
 						if (i != j && clients_state[j] == 2)
 						{
-							printf("DUO game begin.\n");
+							printf("DUO game begin...\n");
 							//call thread
+							duo_game game_data;
+							game_data.player_one = p;
+							game_data.player_two = player1;
+							DWORD id;
+							HANDLE game = CreateThread(NULL, 0, &duo_game_thread, &game_data, 0, &id);
+							found = true;
 						}
 					}
-					clients_state[i] = 2;
+					if(!found)
+						player1 = p;
 					
+					clients_state[i] = 2;
 				}
 				
 

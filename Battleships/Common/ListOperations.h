@@ -329,6 +329,35 @@ LIST* arrayToList(FIELD* array, int array_size)
 	return lista;
 }
 
+void changeState(LIST **head, int rowKey, int columnKey)
+{
+	LIST* temp;
+	if ((head) == NULL)
+	{
+		return;
+	}
+	else
+	{
+		temp = *(head);
+		while (temp != NULL)
+		{
+			if (temp->value.row == rowKey && temp->value.column == columnKey)
+			{
+				temp->value.state = 1;
+			}
+
+			temp = temp->next;
+		}
+	}
+
+	FIELD f;
+	f.row = rowKey;
+	f.column = columnKey;
+	f.state = -1;
+	
+	PushFront(&(*head), f);
+	return;
+}
 
 LIST* get_random_battlefield()
 {

@@ -12,28 +12,6 @@ typedef struct user_st
 	char password[15];
 }USER;
 
-typedef struct player_st
-{
-	USER user;
-	SOCKET socket;
-	int index;
-	int mode;	//je rezim igranja, 1 za solo, 2 za duo
-	bool is_playing;
-}PLAYER;
-
-typedef struct single_st
-{
-	PLAYER player;
-	//ovde cemo posle da dodajemo sta nam treba
-}SINGLE_PLAYER;
-
-typedef struct multi_st
-{
-	PLAYER player1;
-	PLAYER player2;
-	//kasnije
-}MULTI_PLAYER;
-
 
 FILE *safe_fopen(char *file_name, char *mode, int err)
 {
@@ -55,8 +33,6 @@ void save_user(USER user)
 
 bool validate_user(USER user)
 {
-
-
 	FILE *fp = safe_fopen(FILE_NAME, "r", 1);
 	USER temp;
 	bool found = false;
