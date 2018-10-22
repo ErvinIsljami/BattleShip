@@ -1,1 +1,10 @@
-﻿  Server.vcxproj -> C:\Users\e324-2015\Desktop\BattleShip\Battleships\Debug\Server.exe
+﻿  Server.cpp
+c:\users\ervin\desktop\battleship\battleships\common\listoperations.h(287): warning C4101: 'listField': unreferenced local variable
+c:\users\ervin\desktop\battleship\battleships\common\listoperations.h(371): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\ervin\desktop\battleship\battleships\common\networkcommands.h(11): warning C4081: expected '('; found 'constant'
+c:\users\ervin\desktop\battleship\battleships\common\networkcommands.h(190): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\ervin\desktop\battleship\battleships\common\networkcommands.h(195): warning C4101: 'move_c': unreferenced local variable
+c:\users\ervin\desktop\battleship\battleships\server\server.cpp(36): warning C4101: 'dataBuffer': unreferenced local variable
+c:\users\ervin\desktop\battleship\battleships\server\server.cpp(27): warning C4101: 'player2': unreferenced local variable
+c:\users\ervin\desktop\battleship\battleships\common\listoperations.h(264): warning C4715: 'GetNth': not all control paths return a value
+  Server.vcxproj -> C:\Users\Ervin\Desktop\BattleShip\Battleships\Debug\Server.exe

@@ -353,17 +353,13 @@ bool play_game(SOCKET socket, LIST **head, int mode)
 		memset(recvBuffer, 0, 1);
 		iResult = RecievePacket(socket, recvBuffer, len);
 		
-		free(recvBuffer);
-		iResult = RecievePacket(socket, (char*)&len, 4);
-		recvBuffer = (char*)malloc(len + 1);
-		memset(recvBuffer, 0, 1);
-		iResult = RecievePacket(socket, recvBuffer, len);
-		printf("Server move: %s", recvBuffer);
-		changeState(&(*head), recvBuffer[0] - '0', recvBuffer[1] - 'A');
 		
-		printf("asdfasdf\n");
-		getchar();
-		getchar();
+		iResult = RecievePacket(socket, (char*)&len, 4);
+		char *recvBuffer2 = (char*)malloc(len + 1);
+		memset(recvBuffer, 0, 1);
+		iResult = RecievePacket(socket, recvBuffer2, len);
+		
+		changeState(&(*head), recvBuffer2[4] - '0', recvBuffer2[5] - 'A');
 		system("cls");
 	}
 		

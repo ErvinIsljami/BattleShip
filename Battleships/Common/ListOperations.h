@@ -344,6 +344,7 @@ void changeState(LIST **head, int rowKey, int columnKey)
 			if (temp->value.row == rowKey && temp->value.column == columnKey)
 			{
 				temp->value.state = 1;
+				return;
 			}
 
 			temp = temp->next;

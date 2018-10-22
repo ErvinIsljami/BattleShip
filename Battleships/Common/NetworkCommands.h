@@ -211,7 +211,7 @@ DWORD WINAPI solo_game_thread(LPVOID lpParam)
 		SendPacket(p->socket, (char*)(&len), 4);
 		SendPacket(p->socket, (char*)(&response), sizeof(server_response));
 
-
+		Sleep(200);
 
 		//pogadja potez
 		move_command command;
@@ -220,7 +220,7 @@ DWORD WINAPI solo_game_thread(LPVOID lpParam)
 		command.move[1] = rand() % 10 + 'A';
 		command.move[2] = 0;
 		printf("Server played %s \n", command.move);
-		len = sizeof(start_command);
+		len = sizeof(move_command);
 		//salje svoj potez serveru
 		SendPacket(p->socket, (char*)(&len), 4);
 		SendPacket(p->socket, (char*)(&command), sizeof(move_command));
