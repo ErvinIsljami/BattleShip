@@ -155,3 +155,29 @@ int RecievePacket(SOCKET socket, char * recvBuffer, int length)
 
 	return 1;
 }
+
+typedef struct duo_game_st
+{
+	SOCKET player1;
+	SOCKET player2;
+	char username1[10];
+	char username2[10];
+	LIST *player1_ships;
+	LIST *player2_ships;
+}duo_game;
+
+typedef struct solo_game_st
+{
+	SOCKET player;
+	char username[10];
+	LIST *player_ships;
+};
+DWORD WINAPI duo_game_thread(LPVOID lpParam)
+{
+
+}
+
+DWORD WINAPI solo_game_thread(LPVOID lpParam)
+{
+
+}

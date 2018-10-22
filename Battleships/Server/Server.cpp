@@ -258,12 +258,35 @@ int main()
 					FIELD *desiralized = (FIELD*)command->sparse_matrix;
 					system("cls");
 					printf("testing serialization");
-					for (int i = 0; i < command->matrix_size; i++)
+					for (int j = 0; j < command->matrix_size; j++)
 					{
-						printf("(%d, %d) -> %d \n", desiralized[i].row, desiralized[i].column, desiralized[i].state);
+						printf("(%d, %d) -> %d \n", desiralized[j].row, desiralized[j].column, desiralized[j].state);
 					}
 					clients_state[i] = 1;
 				}
+				else if (recvBuffer[0] == NEW_DUO_GAME)
+				{
+					start_command *command = (start_command*)(recvBuffer);
+					FIELD *desirialized = (FIELD*)command->sparse_matrix;
+					system("cls");
+					for (int j = 0; j < command->matrix_size; j++)
+					{
+						printf("(%d, %d) -> %d \n", desirialized[j].row, desirialized[j].column, desirialized[j].state);
+					}
+					bool nasao = false;
+					for (int j = 0; j < MAX_CLIENTS; j++)
+					{
+						if (i != j && clients_state[j] == 2)
+						{
+							printf("DUO game begin.\n");
+							//call thread
+						}
+					}
+					clients_state[i] = 2;
+					
+				}
+				
+
 				free(recvBuffer);
 				// here is where server shutdown loguc could be placed
 			}

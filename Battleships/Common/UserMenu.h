@@ -322,7 +322,11 @@ bool play_game(SOCKET socket, LIST **head, int mode)
 {
 	FIELD *serialized = list_to_array(*head);
 	start_command command;
-	command.command_id = NEW_SOLO_GAME;
+	if (mode == 1)
+		command.command_id = NEW_SOLO_GAME;
+	else
+		command.command_id = NEW_DUO_GAME;
+
 	command.mode = mode;
 	command.matrix_size = GetSize(*head);
 	for (int i = 0; i < command.matrix_size; i++)
@@ -330,20 +334,22 @@ bool play_game(SOCKET socket, LIST **head, int mode)
 		command.sparse_matrix[i] = serialized[i];
 	}
 	//system("cls");
-	printf("Testing serialization:\n");
+	/*printf("Testing serialization:\n");
 	for (int i = 0; i < command.matrix_size; i++)
 	{
 		printf("(%d, %d) -> %d \n", command.sparse_matrix[i].row, command.sparse_matrix[i].column, command.sparse_matrix[i].state);
-	}
-	getchar();
+	}*/
 
+	printf("Begin game??\n");
+	getchar();
 	getchar();
 
 	int len = sizeof(start_command);
 	SendPacket(socket, (char*)(&len), 4);
 	SendPacket(socket, (char*)(&command), sizeof(start_command));
 
-
+	getchar();
+	getchar();
 
 
 
