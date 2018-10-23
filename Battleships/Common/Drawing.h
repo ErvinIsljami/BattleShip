@@ -128,9 +128,9 @@ void draw_one_row(LIST *head, int row)
 		if (s == 2)
 			position = 254;
 		else if (s == 1)
-			position = 'x';
+			position = 'X';
 		else if (s == -1)
-			position = 'o';
+			position = 'O';
 
 		fputs(BOX_DUD, stdout);
 		printf(" %c ", position);
@@ -159,9 +159,9 @@ void draw_bottom_side(LIST *head, int row)
 		if (s == 2)
 			position = 254;
 		else if (s == 1)
-			position = 'x';
+			position = 'X';
 		else if (s == -1)
-			position = 'o';
+			position = 'O';
 
 		fputs(BOX_DUD, stdout);
 		printf(" %c ", position);

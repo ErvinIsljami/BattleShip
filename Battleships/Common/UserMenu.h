@@ -221,31 +221,7 @@ void place_battleships(LIST **head)
 	}
 }
 
-bool validate_move(char move[])
-{
-	if (islower(move[0]))
-	{
-		move[0] -= 32;
-	}
-	if (islower(move[1]))
-	{
-		move[1] -= 32;
-	}
-	if (move[0] <= 'J' && move[0] >= 'A')
-	{
-		char temp = move[0];
-		move[0] = move[1];
-		move[1] = temp;
-	}
-	if (move[0] > '9' || move[0] < '0')
-	{
-		return false;
-	}
-	if (move[1] < 'A' || move[1] > 'J')
-	{
-		return false;
-	}
-}
+
 
 bool place_one_battleship(LIST **head, int length, char begin[], char end[])
 {
@@ -332,9 +308,10 @@ bool play_game(SOCKET socket, LIST **head, int mode)
 	LIST *oponent_list = NULL;
 	char move[3];
 	system("cls");
+	int my_hits = 0;
+	int oponent_hits = 0;
 	while (true)
 	{
-		
 		printf("******** Oponents battlefiled ***********\n");
 		draw_table(oponent_list);
 		printf("********** My battlefiled ***************\n");
@@ -343,26 +320,50 @@ bool play_game(SOCKET socket, LIST **head, int mode)
 		move_command command;
 		command.code = MOVE;
 		scanf("%s",command.move);
+		FIELD field;
+		validate_move(command.move);
+		field.row = command.move[0] - '0';
+		field.column = command.move[1] - 'A';
 		int len = sizeof(start_command);
 		//salje svoj potez serveru
 		SendPacket(socket, (char*)(&len), 4);
 		SendPacket(socket, (char*)(&command), sizeof(start_command));
 
+		//prima odgovor
 		int iResult = RecievePacket(socket, (char*)&len, 4);
 		char *recvBuffer = (char*)malloc(len + 1);
 		memset(recvBuffer, 0, 1);
 		iResult = RecievePacket(socket, recvBuffer, len);
-		
-		
+		server_response *result = (server_response*)recvBuffer;
+		if (result->code == MOVE_HIT)
+		{
+			field.state = 1;
+			my_hits++;
+			if (my_hits == 17)
+				break;
+		}
+		else
+		{
+			field.state = -1;
+		}
+		PushFront(&oponent_list, field);
+
 		iResult = RecievePacket(socket, (char*)&len, 4);
 		char *recvBuffer2 = (char*)malloc(len + 1);
 		memset(recvBuffer, 0, 1);
 		iResult = RecievePacket(socket, recvBuffer2, len);
-		
+		if (searchValue(*head, recvBuffer2[4] - '0', recvBuffer2[5] - 'A') == 2)
+		{
+			oponent_hits++;
+			if (oponent_hits == 17)
+				break;
+		}
 		changeState(&(*head), recvBuffer2[4] - '0', recvBuffer2[5] - 'A');
 		system("cls");
 	}
-		
-
+	if (my_hits == 17)
+	{
+		//shutdown
+	}
 	return false;
 }

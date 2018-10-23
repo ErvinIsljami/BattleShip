@@ -7,6 +7,7 @@
 #include "conio.h"
 #include "UserFunctions.h"
 #include "ListOperations.h"
+#include "Drawing.h"
 #pragma warning(disable : 4996)
 #pragma pack 1
 enum command_ids
@@ -174,14 +175,29 @@ int RecievePacket(SOCKET socket, char * recvBuffer, int length)
 	return 1;
 }
 
-DWORD WINAPI duo_game_thread(LPVOID lpParam)
+bool validate_move(char move[])
 {
-	while (true)
+	if (islower(move[0]))
 	{
-		duo_game *data = (duo_game*)lpParam;
-		printf("Igra izmedju %s i %s pocela.\n", data->player_one.username, data->player_two.username);
-
-		Sleep(3000);
+		move[0] -= 32;
+	}
+	if (islower(move[1]))
+	{
+		move[1] -= 32;
+	}
+	if (move[0] <= 'J' && move[0] >= 'A')
+	{
+		char temp = move[0];
+		move[0] = move[1];
+		move[1] = temp;
+	}
+	if (move[0] > '9' || move[0] < '0')
+	{
+		return false;
+	}
+	if (move[1] < 'A' || move[1] > 'J')
+	{
+		return false;
 	}
 }
 
@@ -190,23 +206,30 @@ DWORD WINAPI solo_game_thread(LPVOID lpParam)
 	srand(time(NULL));
 	player *p = (player*)lpParam;
 	printf("Player %s started game.\n", p->username);
+	LIST * my_list = NULL;
+	my_list = get_random_battlefield();
+	draw_table(my_list);
 	while (true)
 	{
-		move_command move_c;
+		move_command *move_c;
 		int len = sizeof(move_command);
 		//prima klijentov potez
 
 		int iResult = RecievePacket(p->socket, (char*)&len, 4);
 		char *recvBuffer = (char*)malloc(len + 1);
-		memset(recvBuffer, 0, 1);
 		iResult = RecievePacket(p->socket, recvBuffer, len);
-		
+		move_c = (move_command*)recvBuffer;
+		validate_move(move_c->move);
 		//provera poteza i validacija... treba implementirati da i server cita random matricu
-
-
-		//odgovara na potez
 		server_response response;
 		response.code = MOVE_MISS;
+		if (searchValue(my_list, move_c->move[0] - '0', move_c->move[1] - 'A') == 2)
+		{
+			response.code = MOVE_HIT;
+		}
+		changeState(&my_list, move_c->move[0] - '0', move_c->move[1] - 'A');
+
+		//odgovara na potez
 		len = sizeof(server_response);
 		SendPacket(p->socket, (char*)(&len), 4);
 		SendPacket(p->socket, (char*)(&response), sizeof(server_response));
@@ -227,3 +250,88 @@ DWORD WINAPI solo_game_thread(LPVOID lpParam)
 
 	}
 }
+
+DWORD WINAPI duo_game_thread(LPVOID lpParam)
+{
+	duo_game *data = (duo_game*)lpParam;
+	printf("Igra izmedju %s i %s pocela.\n", data->player_one.username, data->player_two.username);
+	while (true)
+	{
+#pragma region recv(p1, move1);
+		//prvi klijent igra
+		move_command *move_c1;
+		int len1 = sizeof(move_command);
+		int iResult = RecievePacket(data->player_one.socket, (char*)&len1, 4);
+		char *recvBuffer1 = (char*)malloc(len1 + 1);
+		iResult = RecievePacket(data->player_one.socket, recvBuffer1, len1);
+		move_c1 = (move_command*)recvBuffer1;
+		validate_move(move_c1->move);
+#pragma endregion
+
+#pragma region send(p1, hit/miss);
+		server_response response1;
+		response1.code = MOVE_MISS;
+		if (searchValue(data->player_two.ships, move_c1->move[0] - '0', move_c1->move[1] - 'A') == 2)
+		{
+			response1.code = MOVE_HIT;
+		}
+		len1 = sizeof(server_response);
+		SendPacket(data->player_one.socket, (char*)(&len1), 4);
+		SendPacket(data->player_one.socket, (char*)(&response1), sizeof(server_response));
+#pragma endregion
+
+#pragma region recv(p2, move2);
+		//drugi klijent igra
+		move_command *move_c2;
+		int len2 = sizeof(move_command);
+		iResult = RecievePacket(data->player_two.socket, (char*)&len2, 4);
+		char *recvBuffer2 = (char*)malloc(len2 + 1);
+		iResult = RecievePacket(data->player_two.socket, recvBuffer2, len2);
+		move_c2 = (move_command*)recvBuffer2;
+		validate_move(move_c2->move);
+#pragma endregion
+
+#pragma region send(p2, hit/miss);
+		server_response response2;
+		response2.code = MOVE_MISS;
+		if (searchValue(data->player_one.ships, move_c2->move[0] - '0', move_c2->move[1] - 'A') == 2)
+		{
+			response2.code = MOVE_HIT;
+		}
+		len2 = sizeof(server_response);
+		SendPacket(data->player_two.socket, (char*)(&len2), 4);
+		SendPacket(data->player_two.socket, (char*)(&response2), sizeof(server_response));
+#pragma endregion
+
+#pragma region send(p1, move2);
+		move_command command1;
+		command1.code = MOVE;
+		command1.move[0] = move_c2->move[0];
+		command1.move[1] = move_c2->move[1];
+		command1.move[2] = 0;
+		len1 = sizeof(move_command);
+		SendPacket(data->player_one.socket, (char*)(&len1), 4);
+		SendPacket(data->player_one.socket, (char*)(&command1), sizeof(move_command));
+#pragma endregion
+
+#pragma region send(p2, move1);
+		move_command command2;
+		command2.code = MOVE;
+		command2.move[0] = move_c1->move[0];
+		command2.move[1] = move_c1->move[1];
+		command2.move[2] = 0;
+		len2 = sizeof(move_command);
+		SendPacket(data->player_two.socket, (char*)(&len2), 4);
+		SendPacket(data->player_two.socket, (char*)(&command2), sizeof(move_command));
+#pragma endregion
+		
+	}
+
+}
+//primim od prvog potez, prosledim drugom taj potez, a prvom jel hit ili nije
+//primim od drugog potez, prosledim prvom taj potez, a drugom jel hit ili nije
+/*
+	recv(p1, move1);
+	send(p2, move1);
+	send(p1, hit/miss);
+*/
