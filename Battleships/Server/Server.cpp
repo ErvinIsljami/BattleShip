@@ -283,7 +283,7 @@ int main()
 					strcpy(p.username, client_name);
 					for (int j = 0; j < command->matrix_size; j++)
 					{
-						PushFront(&p.ships, desirialized[i]);
+						PushFront(&p.ships, desirialized[j]);
 					}
 					bool found = false;
 					for (int j = 0; j < MAX_CLIENTS; j++)

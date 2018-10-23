@@ -135,10 +135,16 @@ void draw_one_row(LIST *head, int row)
 		fputs(BOX_DUD, stdout);
 		printf(" %c ", position);
 	}
-	if (searchValue(head, row, 9) == 2)
+	int temp = searchValue(head, row, 9);
+	if (temp == 2)
 		position = 254;
+	else if (temp == -1)
+		position = 'O';
+	else if (temp == 1)
+		position = 'X';
 	else
 		position = ' ';
+
 	fputs(BOX_DUD, stdout);
 	printf(" %c ", position);
 	fputs(BOX_DUD"\n", stdout);

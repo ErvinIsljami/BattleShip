@@ -303,6 +303,7 @@ DWORD WINAPI duo_game_thread(LPVOID lpParam)
 		SendPacket(data->player_two.socket, (char*)(&response2), sizeof(server_response));
 #pragma endregion
 
+
 #pragma region send(p1, move2);
 		move_command command1;
 		command1.code = MOVE;
@@ -328,10 +329,3 @@ DWORD WINAPI duo_game_thread(LPVOID lpParam)
 	}
 
 }
-//primim od prvog potez, prosledim drugom taj potez, a prvom jel hit ili nije
-//primim od drugog potez, prosledim prvom taj potez, a drugom jel hit ili nije
-/*
-	recv(p1, move1);
-	send(p2, move1);
-	send(p1, hit/miss);
-*/
