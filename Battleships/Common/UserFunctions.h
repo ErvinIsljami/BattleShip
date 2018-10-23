@@ -12,7 +12,6 @@ typedef struct user_st
 	char password[15];
 }USER;
 
-
 FILE *safe_fopen(char *file_name, char *mode, int err)
 {
 	FILE *file = fopen(file_name, mode);
