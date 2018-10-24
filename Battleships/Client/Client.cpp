@@ -1,7 +1,5 @@
-#define WIN32_LEAN_AND_MEAN
-
 #include "UserMenu.h"
-#include "Drawing.h"
+
 
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
@@ -118,14 +116,14 @@ int main()
 	if (is_won)
 	{
 		system("cls");
-		printf("********CONGRATULATIONS********\n");
+		printf("********WINNER********\n");
 	}
 	else
 	{
 		system("cls");
-		printf("********PUSSY ASS NIGGA********\n");
+		printf("********LOOSER********\n");
 	}
-
+	ClearList(&head);
 	// Shutdown the connection since we're done
 	iResult = shutdown(connectSocket, SD_BOTH);
 
@@ -137,8 +135,6 @@ int main()
 		WSACleanup();
 		return 1;
 	}
-
-	Sleep(1000);
 
 	// Close connected socket
 	closesocket(connectSocket);

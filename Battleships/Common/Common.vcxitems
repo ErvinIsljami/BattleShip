@@ -15,9 +15,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)Drawing.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Libs.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ListOperations.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)NetworkCommands.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)UserFunctions.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)UserMenu.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Drawing.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)ListOperations.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NetworkCommands.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)UserFunctions.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)UserMenu.cpp" />
   </ItemGroup>
 </Project>

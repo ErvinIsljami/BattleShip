@@ -1,7 +1,5 @@
-#define WIN32_LEAN_AND_MEAN
+#include "UserMenu.h"
 
-#include "NetworkCommands.h"
-#include "UserFunctions.h"
 
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
@@ -203,9 +201,7 @@ int main()
 						return 1;
 					}
 				}
-				//printf("Duzina: %d \n", len);
 				char *recvBuffer = (char*)malloc(len + 1);
-				memset(recvBuffer, 0, 1);
 				iResult = RecievePacket(clientSockets[i], recvBuffer, len);
 				if (iResult != 1)
 				{
@@ -221,7 +217,7 @@ int main()
 						return 1;
 					}
 				}
-				//handle user message
+				
 				if (recvBuffer[0] == REGISTER) //
 				{
 					register_command *command = (register_command*)(recvBuffer);
@@ -266,7 +262,7 @@ int main()
 					strcpy(game_data.username, client_name);
 					for (int j = 0; j < command->matrix_size; j++)
 					{
-						PushFront(&game_data.ships, command->sparse_matrix[j]);
+						PushFront(&game_data.ships, command->sparse_matrix[j]); //free in solo_game_thread
 					}
 					clients_state[i] = 1;
 					DWORD id;
@@ -283,7 +279,7 @@ int main()
 					strcpy(p.username, client_name);
 					for (int j = 0; j < command->matrix_size; j++)
 					{
-						PushFront(&p.ships, desirialized[j]);
+						PushFront(&p.ships, desirialized[j]);	//free in duo_game_thread
 					}
 					bool found = false;
 					for (int j = 0; j < MAX_CLIENTS; j++)
@@ -291,7 +287,6 @@ int main()
 						if (i != j && clients_state[j] == 2)
 						{
 							printf("DUO game begin...\n");
-							//call thread
 							duo_game game_data;
 							game_data.player_one = p;
 							game_data.player_two = player1;
@@ -305,7 +300,6 @@ int main()
 					
 					clients_state[i] = 2;
 				}
-				
 
 				free(recvBuffer);
 				// here is where server shutdown loguc could be placed

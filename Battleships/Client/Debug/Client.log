@@ -1,13 +1,23 @@
 ﻿  Client.cpp
-c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.h(287): warning C4101: 'listField': unreferenced local variable
-c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.h(371): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-c:\users\e324-2015\desktop\battleship\battleships\common\drawing.h(129): warning C4309: '=': truncation of constant value
-c:\users\e324-2015\desktop\battleship\battleships\common\drawing.h(140): warning C4309: '=': truncation of constant value
-c:\users\e324-2015\desktop\battleship\battleships\common\drawing.h(166): warning C4309: '=': truncation of constant value
-c:\users\e324-2015\desktop\battleship\battleships\common\networkcommands.h(12): warning C4081: expected '('; found 'constant'
-c:\users\e324-2015\desktop\battleship\battleships\common\networkcommands.h(206): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-c:\users\e324-2015\desktop\battleship\battleships\common\usermenu.h(309): warning C4101: 'move': unreferenced local variable
-c:\users\e324-2015\desktop\battleship\battleships\client\client.cpp(29): warning C4101: 'dataBuffer': unreferenced local variable
-c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.h(264): warning C4715: 'GetNth': not all control paths return a value
-c:\users\e324-2015\desktop\battleship\battleships\common\networkcommands.h(202): warning C4715: 'validate_move': not all control paths return a value
+c:\users\e324-2015\desktop\battleship\battleships\client\client.cpp(27): warning C4101: 'dataBuffer': unreferenced local variable
+  UserMenu.cpp
+c:\users\e324-2015\desktop\battleship\battleships\common\usermenu.cpp(4): warning C4081: expected '('; found 'constant'
+c:\users\e324-2015\desktop\battleship\battleships\common\usermenu.cpp(303): warning C4101: 'move': unreferenced local variable
+  UserFunctions.cpp
+c:\users\e324-2015\desktop\battleship\battleships\common\userfunctions.cpp(4): warning C4081: expected '('; found 'constant'
+  NetworkCommands.cpp
+c:\users\e324-2015\desktop\battleship\battleships\common\networkcommands.cpp(3): warning C4081: expected '('; found 'constant'
+c:\users\e324-2015\desktop\battleship\battleships\common\networkcommands.cpp(127): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  ListOperations.cpp
+c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.cpp(4): warning C4081: expected '('; found 'constant'
+c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.cpp(250): warning C4101: 'listField': unreferenced local variable
+c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.cpp(334): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  Drawing.cpp
+c:\users\e324-2015\desktop\battleship\battleships\common\drawing.cpp(5): warning C4081: expected '('; found 'constant'
+c:\users\e324-2015\desktop\battleship\battleships\common\drawing.cpp(21): warning C4309: '=': truncation of constant value
+c:\users\e324-2015\desktop\battleship\battleships\common\drawing.cpp(32): warning C4309: '=': truncation of constant value
+c:\users\e324-2015\desktop\battleship\battleships\common\drawing.cpp(58): warning C4309: '=': truncation of constant value
+  Generating Code...
+c:\users\e324-2015\desktop\battleship\battleships\common\listoperations.cpp(228): warning C4715: 'GetNth': not all control paths return a value
+c:\users\e324-2015\desktop\battleship\battleships\common\networkcommands.cpp(123): warning C4715: 'validate_move': not all control paths return a value
   Client.vcxproj -> C:\Users\e324-2015\Desktop\BattleShip\Battleships\Debug\Client.exe
