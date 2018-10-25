@@ -9,11 +9,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client", "Client\Client.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcxitems", "{BDCEFBF4-D267-4C1A-A02D-BB78A5B0BDA8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StressTestSinglePlayer", "StressTestSinglePlayer\StressTestSinglePlayer.vcxproj", "{E35C4708-1544-4297-8606-63E50B3017DE}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Common\Common.vcxitems*{0426ebe9-e22c-409c-9f00-a0d84d6c117a}*SharedItemsImports = 4
 		Common\Common.vcxitems*{246436a6-1f5e-47de-a8ad-a8f3a03263e4}*SharedItemsImports = 4
 		Common\Common.vcxitems*{bdcefbf4-d267-4c1a-a02d-bb78a5b0bda8}*SharedItemsImports = 9
+		Common\Common.vcxitems*{e35c4708-1544-4297-8606-63e50b3017de}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -38,6 +41,14 @@ Global
 		{246436A6-1F5E-47DE-A8AD-A8F3A03263E4}.Release|x64.Build.0 = Release|x64
 		{246436A6-1F5E-47DE-A8AD-A8F3A03263E4}.Release|x86.ActiveCfg = Release|Win32
 		{246436A6-1F5E-47DE-A8AD-A8F3A03263E4}.Release|x86.Build.0 = Release|Win32
+		{E35C4708-1544-4297-8606-63E50B3017DE}.Debug|x64.ActiveCfg = Debug|x64
+		{E35C4708-1544-4297-8606-63E50B3017DE}.Debug|x64.Build.0 = Debug|x64
+		{E35C4708-1544-4297-8606-63E50B3017DE}.Debug|x86.ActiveCfg = Debug|Win32
+		{E35C4708-1544-4297-8606-63E50B3017DE}.Debug|x86.Build.0 = Debug|Win32
+		{E35C4708-1544-4297-8606-63E50B3017DE}.Release|x64.ActiveCfg = Release|x64
+		{E35C4708-1544-4297-8606-63E50B3017DE}.Release|x64.Build.0 = Release|x64
+		{E35C4708-1544-4297-8606-63E50B3017DE}.Release|x86.ActiveCfg = Release|Win32
+		{E35C4708-1544-4297-8606-63E50B3017DE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

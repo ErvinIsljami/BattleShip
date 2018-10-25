@@ -167,6 +167,7 @@ bool log_in(SOCKET socket)
 	return true;
 }
 
+
 void place_battleships(LIST **head)
 {
 	draw_table(*head);
@@ -316,6 +317,97 @@ bool play_game(SOCKET socket, LIST **head, int mode)
 		scanf("%s", command.move);
 		FIELD field;
 		validate_move(command.move);
+		field.row = command.move[0] - '0';
+		field.column = command.move[1] - 'A';
+		int len = sizeof(start_command);
+		//salje svoj potez serveru
+		SendPacket(socket, (char*)(&len), 4);
+		SendPacket(socket, (char*)(&command), sizeof(start_command));
+
+		//prima odgovor
+		int iResult = RecievePacket(socket, (char*)&len, 4);
+		char *recvBuffer = (char*)malloc(len + 1);
+		memset(recvBuffer, 0, 1);
+		iResult = RecievePacket(socket, recvBuffer, len);
+		server_response *result = (server_response*)recvBuffer;
+		if (result->code == MOVE_HIT)
+		{
+			field.state = 1;
+			my_hits++;
+			if (my_hits == 17)
+				break;
+		}
+		else
+		{
+			field.state = -1;
+		}
+		PushFront(&oponent_list, field);
+		free(recvBuffer);
+
+		iResult = RecievePacket(socket, (char*)&len, 4);
+		char *recvBuffer2 = (char*)malloc(len + 1);
+		memset(recvBuffer, 0, 1);
+		iResult = RecievePacket(socket, recvBuffer2, len);
+		if (searchValue(*head, recvBuffer2[4] - '0', recvBuffer2[5] - 'A') == 2)
+		{
+			oponent_hits++;
+			if (oponent_hits == 17)
+				break;
+		}
+		changeState(&(*head), recvBuffer2[4] - '0', recvBuffer2[5] - 'A');
+		system("cls");
+		free(recvBuffer2);
+	}
+
+	ClearList(&oponent_list);
+	if (my_hits == 17)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool play_game_automatic(SOCKET socket, LIST **head, int mode)
+{
+	FIELD *serialized = list_to_array(*head);
+	start_command command;
+	if (mode == 1)
+		command.command_id = NEW_SOLO_GAME;
+	else
+		command.command_id = NEW_DUO_GAME;
+	
+	command.mode = mode;
+	command.matrix_size = GetSize(*head);
+	for (int i = 0; i < command.matrix_size; i++)
+	{
+		command.sparse_matrix[i] = serialized[i];
+	}
+
+	int len = sizeof(start_command);
+	SendPacket(socket, (char*)(&len), 4);
+	SendPacket(socket, (char*)(&command), sizeof(start_command));
+	free(serialized); //free the aray which was send
+					  //ovde krece igra...
+	//system("mode con: cols=110 lines=65");
+	LIST *oponent_list = NULL;
+	char move[3];
+	system("cls");
+	int my_hits = 0;
+	int oponent_hits = 0;
+	int moves = 0;
+	while (true)
+	{
+		//printf("******** Oponents battlefiled ***********\n");
+		//draw_table(oponent_list);
+		//printf("********** My battlefiled ***************\n");
+		//draw_table(*head);
+		//printf("Guess field: ");
+		move_command command;
+		command.code = MOVE;
+		command.move[0] = moves / 10 + '0';
+		command.move[1] = moves % 10 + 'A';
+		moves++;
+		FIELD field;
 		field.row = command.move[0] - '0';
 		field.column = command.move[1] - 'A';
 		int len = sizeof(start_command);

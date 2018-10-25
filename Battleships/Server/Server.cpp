@@ -8,7 +8,7 @@
 
 #define SERVER_PORT 27016
 #define BUFFER_SIZE 256
-#define MAX_CLIENTS 100
+#define MAX_CLIENTS 100000
 
 // TCP server that use non-blocking sockets
 int main()

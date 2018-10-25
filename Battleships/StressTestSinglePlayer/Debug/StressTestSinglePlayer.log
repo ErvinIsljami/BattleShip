@@ -1,0 +1,3 @@
+﻿  StressTestSinglePlayer.cpp
+c:\users\ervin\desktop\battleship\battleships\stresstestsingleplayer\stresstestsingleplayer.cpp(59): warning C4101: 'dataBuffer': unreferenced local variable
+  StressTestSinglePlayer.vcxproj -> C:\Users\Ervin\Desktop\BattleShip\Battleships\Debug\StressTestSinglePlayer.exe

@@ -76,7 +76,7 @@ void PrintList(LIST * head)
 
 }
 
-FILE *safe_fopen(char *file_name, char *mode, int err)
+FILE *safe_fopen(const char file_name[],const char mode[], int err)
 {
 	FILE *file = fopen(file_name, mode);
 	if (file == NULL)

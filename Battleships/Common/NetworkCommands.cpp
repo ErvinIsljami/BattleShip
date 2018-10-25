@@ -12,7 +12,9 @@ int SendPacket(SOCKET socket, char * message, int messageSize)
 	timeval timeVal;
 	timeVal.tv_sec = 1;
 	timeVal.tv_usec = 0;
-
+	unsigned long  mode = 1;
+	if (ioctlsocket(socket, FIONBIO, &mode) != 0)
+		printf("ioctlsocket failed with error.");
 	do
 	{
 		FD_SET(socket, &writefds);
@@ -53,6 +55,11 @@ int RecievePacket(SOCKET socket, char * recvBuffer, int length)
 	timeval timeVal;
 	timeVal.tv_sec = 1;
 	timeVal.tv_usec = 0;
+
+	unsigned long  mode = 1;
+	if (ioctlsocket(socket, FIONBIO, &mode) != 0)
+		printf("ioctlsocket failed with error.");
+
 
 	do
 	{
@@ -124,65 +131,148 @@ bool validate_move(char move[])
 
 DWORD WINAPI solo_game_thread(LPVOID lpParam)
 {
-	srand(time(NULL));
+	//srand(time(NULL));
 	player *p = (player*)lpParam;
 	printf("Player %s started game.\n", p->username);
 	LIST * my_list = NULL;
 	my_list = get_random_battlefield();
-	draw_table(my_list);
+	//draw_table(my_list);
 	int my_hits = 0;
 	int client_hits = 0;
-	char *recvBuffer;
+	char *recvBuffer = NULL;
+	int tempMove = 0;
+	int state = 0;
+	unsigned long  mode = 1;
+	if (ioctlsocket(p->socket, FIONBIO, &mode) != 0)
+		printf("ioctlsocket failed with error.");
+
 	while (true)
 	{
-		move_command *move_c;
-		int len = sizeof(move_command);
-		//prima klijentov potez
-
-		int iResult = RecievePacket(p->socket, (char*)&len, 4);
-		recvBuffer = (char*)malloc(len + 1);
-		iResult = RecievePacket(p->socket, recvBuffer, len);
-		move_c = (move_command*)recvBuffer;
-		validate_move(move_c->move);
-		//provera poteza i validacija... treba implementirati da i server cita random matricu
+		move_command *move_c = NULL;
+		
+		int len;
 		server_response response;
-		response.code = MOVE_MISS;
-		int hit = searchValue(my_list, move_c->move[0] - '0', move_c->move[1] - 'A');
-		if (hit == 2)
+		//prima klijentov potez
+		int iResult;
+		//implementiran FSM za igranje na serveru
+		// state 0 = prima potez od igraca
+		// state 1 = salje miss/hit
+		// state 2 = salje svoj potez
+		if (state == 0)	//rec client move
 		{
-			response.code = MOVE_HIT;
-			client_hits++;
+			do
+			{
+				fd_set readfds;
+				FD_ZERO(&readfds);
+				FD_SET(p->socket, &readfds);
+
+				timeval timeVal;
+				timeVal.tv_sec = 1;
+				timeVal.tv_usec = 0;
+				int result = select(0, &readfds, NULL, NULL, &timeVal);
+				if (!(result > 0))
+					continue;
+
+				if (FD_ISSET(p->socket, &readfds))
+				{
+					iResult = RecievePacket(p->socket, (char*)&len, 4);
+				
+
+					recvBuffer = (char*)malloc(len + 1);
+					iResult = RecievePacket(p->socket, recvBuffer, len);
+					move_c = (move_command*)recvBuffer;
+					if(move_c != NULL)
+						state = 1;
+				}
+				FD_CLR(p->socket, &readfds);
+				FD_ZERO(&readfds);
+			} while (state == 0);
 		}
-		changeState(&my_list, move_c->move[0] - '0', move_c->move[1] - 'A');
-
-		//odgovara na potez
-		len = sizeof(server_response);
-		SendPacket(p->socket, (char*)(&len), 4);
-		SendPacket(p->socket, (char*)(&response), sizeof(server_response));
-
+		if (state == 1)
+		{
+			response.code = MOVE_MISS;
+			int hit = searchValue(my_list, move_c->move[0] - '0', move_c->move[1] - 'A');
+			if (hit == 2)
+			{
+				response.code = MOVE_HIT;
+				client_hits++;
+			}
+			changeState(&my_list, move_c->move[0] - '0', move_c->move[1] - 'A');
+			do
+			{
+				fd_set writefds;
+				FD_ZERO(&writefds);
+				FD_SET(p->socket, &writefds);
+				timeval timeVal;
+				timeVal.tv_sec = 1;
+				timeVal.tv_usec = 0;
+				int result = select(0, NULL, &writefds, NULL, &timeVal);
+				if (!(result > 0))
+					continue;
+				if (FD_ISSET(p->socket, &writefds))
+				{
+					//odgovara na potez
+					len = sizeof(server_response);
+					SendPacket(p->socket, (char*)(&len), 4);
+					SendPacket(p->socket, (char*)(&response), sizeof(server_response));
+					state = 2;
+				}
+				FD_CLR(p->socket, &writefds);
+				FD_ZERO(&writefds);
+			} while (state == 1);
+		}
+		
 		if (client_hits == 17)
 			break;
 
 		//pogadja potez
 		move_command command;
 		command.code = MOVE;
-		command.move[0] = rand() % 10 + '0';
-		command.move[1] = rand() % 10 + 'A';
+		command.move[0] = tempMove / 10 + '0';
+		command.move[1] = tempMove % 10 + 'A';
+		tempMove++;
 		command.move[2] = 0;
-		len = sizeof(move_command);
-		//salje svoj potez clientu
-		SendPacket(p->socket, (char*)(&len), 4);
-		SendPacket(p->socket, (char*)(&command), sizeof(move_command));
-		if (searchValue(p->ships, command.move[0] - '0', command.move[1] - 'A') == 2)
+
+		if (state == 2)
 		{
-			my_hits++;
-			if (my_hits == 17)
-				break;
+			do
+			{
+				fd_set writefds;
+				FD_ZERO(&writefds);
+				FD_SET(p->socket, &writefds);
+
+				timeval timeVal;
+				timeVal.tv_sec = 1;
+				timeVal.tv_usec = 0;
+				int result = select(0, NULL, &writefds, NULL, &timeVal);
+				if (!(result > 0))
+					continue;
+
+				if (FD_ISSET(p->socket, &writefds))
+				{
+					len = sizeof(move_command);
+					SendPacket(p->socket, (char*)(&len), 4);
+					SendPacket(p->socket, (char*)(&command), sizeof(move_command));
+					state = 0;
+				}
+			} while (state == 2);
+
+			int ship_state = searchValue(p->ships, command.move[0] - '0', command.move[1] - 'A');
+			if (ship_state == 2 || ship_state == 1)
+			{
+				changeState(&(p->ships), command.move[0] - '0', command.move[1] - 'A');
+				my_hits++;
+
+			}
 		}
 
+		
+		if (my_hits == 17)
+			break;
 		free(recvBuffer);
 	}
-	free(recvBuffer);
+	if(recvBuffer != NULL)
+		free(recvBuffer);
 	closesocket(p->socket);
 	ClearList(&my_list);
 	ClearList(&(p->ships));
@@ -193,6 +283,8 @@ DWORD WINAPI duo_game_thread(LPVOID lpParam)
 {
 	duo_game *data = (duo_game*)lpParam;
 	printf("Igra izmedju %s i %s pocela.\n", data->player_one.username, data->player_two.username);
+	draw_table(data->player_one.ships);
+	draw_table(data->player_two.ships);
 	while (true)
 	{
 #pragma region recv(p1, move1);
@@ -212,6 +304,7 @@ DWORD WINAPI duo_game_thread(LPVOID lpParam)
 		response1.code = MOVE_MISS;
 		if (searchValue(data->player_two.ships, move_c1->move[0] - '0', move_c1->move[1] - 'A') == 2)
 		{
+			changeState(&(data->player_two.ships), move_c1->move[0] - '0', move_c1->move[1] - 'A');
 			response1.code = MOVE_HIT;
 		}
 		len1 = sizeof(server_response);
@@ -235,6 +328,7 @@ DWORD WINAPI duo_game_thread(LPVOID lpParam)
 		response2.code = MOVE_MISS;
 		if (searchValue(data->player_one.ships, move_c2->move[0] - '0', move_c2->move[1] - 'A') == 2)
 		{
+			changeState(&(data->player_one.ships), move_c2->move[0] - '0', move_c2->move[1] - 'A');
 			response2.code = MOVE_HIT;
 		}
 		len2 = sizeof(server_response);

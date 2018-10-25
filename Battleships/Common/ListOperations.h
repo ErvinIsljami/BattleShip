@@ -23,7 +23,7 @@ typedef struct list_el
 	struct list_el* next;
 }LIST;
 
-FILE *safe_fopen(char *file_name, char *mode, int err);
+FILE *safe_fopen(const char file_name[],const char mode[], int err);
 LIST* load_battlefield(char *file_name);
 void save_battlefield(LIST *head);
 LIST* get_random_battlefield();
