@@ -15,7 +15,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)Drawing.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)Libs.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ListOperations.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)NetworkCommands.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)UserFunctions.h" />

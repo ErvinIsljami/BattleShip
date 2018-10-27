@@ -8,18 +8,12 @@
 
 #define SERVER_PORT 27016
 #define BUFFER_SIZE 256
-#define MAX_CLIENTS 100000
+#define MAX_CLIENTS 10000
 
 // TCP server that use non-blocking sockets
 int main()
-{
-
-#pragma region Connection
-
-	// Socket used for listening for new clients 
+{ 
 	SOCKET listenSocket = INVALID_SOCKET;
-
-	// Sockets used for communication with client
 	SOCKET clientSockets[MAX_CLIENTS];
 	player player1;
 	player player2;
@@ -32,100 +26,30 @@ int main()
 
 	// Buffer used for storing incoming data
 	char dataBuffer[BUFFER_SIZE];
-
-	// WSADATA data structure that is to receive details of the Windows Sockets implementation
-	WSADATA wsaData;
-
-	// Initialize windows sockets library for this process
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
-	{
-		printf("WSAStartup failed with error: %d\n", WSAGetLastError());
-		return 1;
-	}
-
-	// Initialize serverAddress structure used by bind
-	sockaddr_in serverAddress;
-	memset((char*)&serverAddress, 0, sizeof(serverAddress));
-	serverAddress.sin_family = AF_INET;				// IPv4 address family
-	serverAddress.sin_addr.s_addr = INADDR_ANY;		// Use all available addresses
-	serverAddress.sin_port = htons(SERVER_PORT);	// Use specific port
-
-													//initialise all client_socket[] to 0 so not checked
 	memset(clientSockets, 0, MAX_CLIENTS * sizeof(SOCKET));
 
-	// Create a SOCKET for connecting to server
-	listenSocket = socket(AF_INET,      // IPv4 address family
-		SOCK_STREAM,  // Stream socket
-		IPPROTO_TCP); // TCP protocol
+	InitializeWindowsSockets();
 
-					  // Check if socket is successfully created
-	if (listenSocket == INVALID_SOCKET)
-	{
-		printf("socket failed with error: %ld\n", WSAGetLastError());
-		WSACleanup();
-		return 1;
-	}
-
-	// Setup the TCP listening socket - bind port number and local address to socket
-	iResult = bind(listenSocket, (struct sockaddr*) &serverAddress, sizeof(serverAddress));
-
-	// Check if socket is successfully binded to address and port from sockaddr_in structure
-	if (iResult == SOCKET_ERROR)
-	{
-		printf("bind failed with error: %d\n", WSAGetLastError());
-		closesocket(listenSocket);
-		WSACleanup();
-		return 1;
-	}
-
-	// All connections are by default accepted by protocol stek if socket is in listening mode.
-	// With SO_CONDITIONAL_ACCEPT parameter set to true, connections will not be accepted by default
-	//bool bOptVal = true;
-	//int bOptLen = sizeof (bool);
-	//iResult = setsockopt(listenSocket, SOL_SOCKET, SO_CONDITIONAL_ACCEPT, (char *) &bOptVal, bOptLen);
-	//   if (iResult == SOCKET_ERROR) {
-	//       printf("setsockopt for SO_CONDITIONAL_ACCEPT failed with error: %u\n", WSAGetLastError());
-	//}
-
-	unsigned long  mode = 1;
-	if (ioctlsocket(listenSocket, FIONBIO, &mode) != 0)
-		printf("ioctlsocket failed with error.");
-
-	// Set listenSocket in listening mode
-	iResult = listen(listenSocket, SOMAXCONN);
-	if (iResult == SOCKET_ERROR)
-	{
-		printf("listen failed with error: %d\n", WSAGetLastError());
-		closesocket(listenSocket);
-		WSACleanup();
-		return 1;
-	}
-
-	printf("Server socket is set to listening mode. Waiting for new connection requests.\n");
-
-	// set of socket descriptors
-	fd_set readfds;
-
-	// timeout for select function
-	timeval timeVal;
-	timeVal.tv_sec = 1;
-	timeVal.tv_usec = 0;
-#pragma endregion
-
-#pragma region Accept
-
+	BindServerSocket(&listenSocket, SERVER_PORT);
+	
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
 		clients_state[i] = 0;
 	}
 
+	if (setToListenSocket(&listenSocket) == -1)
+	{
+		//handle
+	}
 
 	while (true)
 	{
-		// initialize socket set
+		fd_set readfds;
+		timeval timeVal;
+		timeVal.tv_sec = 1;
+		timeVal.tv_usec = 0;
 		FD_ZERO(&readfds);
 
-		// add server's socket and clients' sockets to set
 		if (lastIndex != MAX_CLIENTS)
 		{
 			FD_SET(listenSocket, &readfds);
@@ -137,7 +61,6 @@ int main()
 				FD_SET(clientSockets[i], &readfds);
 		}
 
-		// wait for events on set
 		int selectResult = select(0, &readfds, NULL, NULL, &timeVal);
 
 		if (selectResult == SOCKET_ERROR)
@@ -153,33 +76,11 @@ int main()
 		}
 		else if (FD_ISSET(listenSocket, &readfds))
 		{
-			// Struct for information about connected client
-			sockaddr_in clientAddr;
-			int clientAddrSize = sizeof(struct sockaddr_in);
-
-			// New connection request is received. Add new socket in array on first free position.
-			clientSockets[lastIndex] = accept(listenSocket, (struct sockaddr *)&clientAddr, &clientAddrSize);
-
-			if (clientSockets[lastIndex] == INVALID_SOCKET)
-			{
-				printf("accept failed with error: %d\n", WSAGetLastError());
-			}
-			else
-			{
-				if (ioctlsocket(clientSockets[lastIndex], FIONBIO, &mode) != 0)
-				{
-					printf("ioctlsocket failed with error.");
-					continue;
-				}
+			printf("bind finished\n");
+			if (acceptNewClient(&listenSocket,&clientSockets[lastIndex]))
 				lastIndex++;
-				printf("New client request accepted (%d). Client address: %s : %d\n", lastIndex, inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
-
-			}
 		}
-#pragma endregion
 
-#pragma region Comunication
-		// Check if new message is received from connected clients
 		for (int i = 0; i < lastIndex; i++)
 		{
 			// Check if new message is received from client on position "i"
@@ -218,9 +119,11 @@ int main()
 					}
 				}
 				
-				if (recvBuffer[0] == REGISTER) //
+				switch (recvBuffer[0])
 				{
-					register_command *command = (register_command*)(recvBuffer);
+				case REGISTER:
+				{
+					register_command * command = (register_command*)(recvBuffer);
 					bool reg = register_user(command->user);
 					if (reg)
 					{
@@ -235,11 +138,12 @@ int main()
 					{
 						printf("Error while registrating user.\n");
 					}
-
 				}
-				else if (recvBuffer[0] == LOGIN)
+
+
+				case LOGIN:
 				{
-					login_command *command = (login_command*)(recvBuffer);
+					login_command * command = (login_command*)(recvBuffer);
 					bool log = login_user(command->uname, command->pass);
 					if (log)
 					{
@@ -252,9 +156,10 @@ int main()
 						SendPacket(clientSockets[i], (char*)(&response), sizeof(server_response));
 					}
 				}
-				else if (recvBuffer[0] == NEW_SOLO_GAME)
+
+				case NEW_SOLO_GAME:
 				{
-					start_command *command = (start_command*)(recvBuffer);
+					start_command * command = (start_command*)(recvBuffer);
 					FIELD *desiralized = (FIELD*)command->sparse_matrix;
 					player game_data;
 					game_data.ships = NULL;
@@ -267,11 +172,11 @@ int main()
 					clients_state[i] = 1;
 					DWORD id;
 					HANDLE game = CreateThread(NULL, 0, &solo_game_thread, &game_data, 0, &id);
-
 				}
-				else if (recvBuffer[0] == NEW_DUO_GAME)
+
+				case NEW_DUO_GAME:
 				{
-					start_command *command = (start_command*)(recvBuffer);
+					start_command * command = (start_command*)(recvBuffer);
 					FIELD *desirialized = (FIELD*)command->sparse_matrix;
 					player p;
 					p.ships = NULL;
@@ -295,20 +200,21 @@ int main()
 							found = true;
 						}
 					}
-					if(!found)
+					if (!found)
 						player1 = p;
-					
+
 					clients_state[i] = 2;
 				}
 
+
+				default:
+					break;
+				}
+
 				free(recvBuffer);
-				// here is where server shutdown loguc could be placed
 			}
 		}
 	}
-
-
-#pragma endregion
 	//Close listen and accepted sockets
 	closesocket(listenSocket);
 

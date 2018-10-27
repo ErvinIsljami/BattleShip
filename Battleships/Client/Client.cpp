@@ -58,7 +58,7 @@ int main()
 	iResult = connect(connectSocket, (SOCKADDR*)&serverAddress, sizeof(serverAddress));
 	if (iResult == SOCKET_ERROR)
 	{
-		printf("Unable to connect to server.\n");
+		printf("Unable to connect to server. Error %d\n", WSAGetLastError());
 		closesocket(connectSocket);
 		WSACleanup();
 		return 1;

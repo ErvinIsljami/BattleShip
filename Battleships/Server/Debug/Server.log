@@ -1,5 +1,1 @@
-﻿  UserMenu.cpp
-c:\users\ervin\desktop\battleship\battleships\common\usermenu.cpp(4): warning C4081: expected '('; found 'constant'
-c:\users\ervin\desktop\battleship\battleships\common\usermenu.cpp(303): warning C4101: 'move': unreferenced local variable
-c:\users\ervin\desktop\battleship\battleships\common\usermenu.cpp(392): warning C4101: 'move': unreferenced local variable
-  Server.vcxproj -> C:\Users\Ervin\Desktop\BattleShip\Battleships\Debug\Server.exe
+﻿

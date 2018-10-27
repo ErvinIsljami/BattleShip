@@ -22,7 +22,7 @@ int main()
 	}
 	DWORD ids[50000];
 	HANDLE games[50000];
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 10000; i++)
 	{
 		games[i] = CreateThread(NULL, 0, &clientThread, NULL, 0, &ids[i]);
 	}
@@ -30,7 +30,6 @@ int main()
 
 	// Deinitialize WSA library
 	WSACleanup();
-	printf("Finished.\n");
 	getchar();
 	getchar();
 	return 0;
@@ -128,23 +127,20 @@ DWORD WINAPI clientThread(LPVOID lpParam)
 	else
 	{
 		//place_battleships(&head);
-		head = get_random_battlefield();
-		system("cls");
+		head = get_random_battlefield_test();
+		
 		//draw_table(head);
 		//save_battlefield(head);
-		printf("Battleships placed. This is your battlefield. Good luck!\n");
 	}
 	is_won = play_game_automatic(connectSocket, &head, game_mode);
 
 	if (is_won)
 	{
-		system("cls");
-		printf("********WINNER********\n");
+		printf("********WINNER %d********\n",serverAddress.sin_port);
 	}
 	else
 	{
-		system("cls");
-		printf("********LOOSER********\n");
+		printf("********LOOSER %d********\n", serverAddress.sin_port);
 	}
 	ClearList(&head);
 	// Shutdown the connection since we're done

@@ -109,9 +109,27 @@
 
 #include "ListOperations.h"
 
+/*Drawing top side of matrix
+*/
 void draw_top_side();
+
+/*Drawing one row of matrix
+	@param head list which will be printed in matrix
+	@param row in the matrix that will be drawn
+*/
 void draw_one_row(LIST *head, int row);
+
+/*Drawing bottom side of matrix
+	@param head list which will be printed in matrix
+	@param row in the matrix that will be drawn
+*/
 void draw_bottom_side(LIST *head, int row);
+
+/*
+	Calling functions to draw top and bottom side of matrix and drawing 9 rows with elements that are forwarded by list
+	@param head list which will be printed in matrix
+	@param row in the matrix that will be drawn
+*/
 void draw_table(LIST *head);
 
 #endif /* DRAWING_H */

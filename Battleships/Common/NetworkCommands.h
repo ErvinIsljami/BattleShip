@@ -4,6 +4,9 @@
 
 #include "Drawing.h"
 
+#pragma region structures
+
+
 static enum command_ids
 {
 	SHUTDOWN = 0,
@@ -83,10 +86,62 @@ typedef struct player_move_command
 
 }move_command;
 
+#pragma endregion
+
+
+/*Sending packet in smaller pieces if buffer doesn't have enough space
+*
+@param socket
+@param message memory location of my message
+@param messageSize size of my message
+@return 1 if message was successfully sent and -1 if sended message is bigger than forwarded size
+*/
 int SendPacket(SOCKET socket, char * message, int messageSize);
+
+/*Receiving packet in smaller pieces if buffer doesn't have enough space
+*
+@param socket
+@param message memory location of my message
+@param messageSize size of my message
+@return 1 if message was successfully sent and -1 is buffer doesn't have enough space to store message
+*/
 int RecievePacket(SOCKET socket, char * recvBuffer, int length);
+
+/*Validating the players move, it is case insensitive and can handle wrong order but not wrong characters and longer/shorter message
+*
+@return true if validation was succesfull, otherwise it returns false
+*/
 bool validate_move(char move[]);
+
+/*Thread for solo game(server vs client)
+*
+@return true if validation was succesfull, otherwise it returns false
+*/
 DWORD WINAPI solo_game_thread(LPVOID lpParam);
+
+/*Thread for duo game(client vs client)
+*
+@return true if validation was succesfull, otherwise it returns false
+*/
 DWORD WINAPI duo_game_thread(LPVOID lpParam);
 
+/*Thread for solo game(server vs client)
+*
+@param socket for communication
+@return true if validation was succesfull, otherwise it returns false
+*/
+DWORD WINAPI solo_game_thread_test(LPVOID lpParam);
+
+/*Initilize windows socket
+	@return true if initlized was succesfull, otherwise returns false
+*/
+bool InitializeWindowsSockets();
+
+/*Seting socket to listen mode
+@param listenSocket Pointer to listen socket which will be set in listen mode
+*/
+int setToListenSocket(SOCKET *listenSocket);
+/**/
+bool acceptNewClient(SOCKET *listenSocket, SOCKET *clientSocket);
+int BindServerSocket(SOCKET *listenSocket, int SERVER_PORT);
 #endif // /* NETWORKCOMMANDS_H */

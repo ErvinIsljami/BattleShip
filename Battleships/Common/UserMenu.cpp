@@ -369,85 +369,188 @@ bool play_game(SOCKET socket, LIST **head, int mode)
 
 bool play_game_automatic(SOCKET socket, LIST **head, int mode)
 {
+	printf("Socket %d started game\n", socket);
 	FIELD *serialized = list_to_array(*head);
 	start_command command;
-	if (mode == 1)
-		command.command_id = NEW_SOLO_GAME;
-	else
-		command.command_id = NEW_DUO_GAME;
-	
+	command.command_id = NEW_SOLO_GAME;
 	command.mode = mode;
 	command.matrix_size = GetSize(*head);
 	for (int i = 0; i < command.matrix_size; i++)
 	{
 		command.sparse_matrix[i] = serialized[i];
 	}
+	free(serialized);
+	//send new game message
+	int i = 0;
+	do
+	{
+		fd_set writefds;
+		FD_ZERO(&writefds);
+		FD_SET(socket, &writefds);
+		timeval timeVal;
+		timeVal.tv_sec = 1;
+		timeVal.tv_usec = 0;
+		unsigned long  modee = 1;
+		if (ioctlsocket(socket, FIONBIO, &modee) != 0)
+			printf("ioctlsocket failed with error.");
 
-	int len = sizeof(start_command);
-	SendPacket(socket, (char*)(&len), 4);
-	SendPacket(socket, (char*)(&command), sizeof(start_command));
-	free(serialized); //free the aray which was send
+		FD_SET(socket, &writefds);
+		int result = select(0, NULL, &writefds, NULL, &timeVal);
+		if (result > 0)
+		{
+			if (FD_ISSET(socket, &writefds))
+			{
+				int len = sizeof(start_command);
+				SendPacket(socket, (char*)(&len), 4);
+				SendPacket(socket, (char*)(&command), sizeof(start_command));
+				break;
+			}
+		}
+		FD_CLR(socket, &writefds);
+	} while (true);
+	 //free the aray which was send
+	printf("Poslao start game\n");
+	Sleep(200);
 					  //ovde krece igra...
-	//system("mode con: cols=110 lines=65");
 	LIST *oponent_list = NULL;
 	char move[3];
-	system("cls");
 	int my_hits = 0;
 	int oponent_hits = 0;
 	int moves = 0;
+	int FSM = 0;
 	while (true)
 	{
-		//printf("******** Oponents battlefiled ***********\n");
-		//draw_table(oponent_list);
-		//printf("********** My battlefiled ***************\n");
-		//draw_table(*head);
-		//printf("Guess field: ");
 		move_command command;
-		command.code = MOVE;
-		command.move[0] = moves / 10 + '0';
-		command.move[1] = moves % 10 + 'A';
-		moves++;
 		FIELD field;
-		field.row = command.move[0] - '0';
-		field.column = command.move[1] - 'A';
-		int len = sizeof(start_command);
 		//salje svoj potez serveru
-		SendPacket(socket, (char*)(&len), 4);
-		SendPacket(socket, (char*)(&command), sizeof(start_command));
+		if (FSM == 0)
+		{
+			command.code = MOVE;
+			command.move[0] = moves / 10 + '0';
+			command.move[1] = moves % 10 + 'A';
+			moves++;
+
+			field.row = command.move[0] - '0';
+			field.column = command.move[1] - 'A';
+
+			do
+			{
+				fd_set writefds;
+				FD_ZERO(&writefds);
+				FD_SET(socket, &writefds);
+				timeval timeVal;
+				timeVal.tv_sec = 1;
+				timeVal.tv_usec = 0;
+				unsigned long  modee = 1;
+				if (ioctlsocket(socket, FIONBIO, &modee) != 0)
+					printf("ioctlsocket failed with error.");
+
+				int result = select(0, NULL, &writefds, NULL, &timeVal);
+				if (result > 0)
+				{
+					if (FD_ISSET(socket, &writefds))
+					{
+						int len = sizeof(start_command);
+						//salje svoj potez serveru
+						SendPacket(socket, (char*)(&len), 4);
+						SendPacket(socket, (char*)(&command), sizeof(start_command));
+						//printf("%d Poslao svoj potez serveru.\n",socket);
+						FSM = 1;
+					}
+				}
+			} while (FSM == 0);
+		}
+		
+		//prima miss/hit
+		if (FSM == 1)
+		{
+			fd_set readfds;
+			FD_ZERO(&readfds);
+			FD_SET(socket, &readfds);
+			timeval timeVal;
+			timeVal.tv_sec = 1;
+			timeVal.tv_usec = 0;
+			unsigned long  modee = 1;
+			if (ioctlsocket(socket, FIONBIO, &modee) != 0)
+				printf("ioctlsocket failed with error.");
+
+			do
+			{
+				FD_SET(socket, &readfds);
+				int result = select(0, NULL, &readfds, NULL, &timeVal);
+				if (result > 0)
+				{
+					if (FD_ISSET(socket, &readfds))
+					{
+						int len;
+						int iResult = RecievePacket(socket, (char*)&len, 4);
+						char *recvBuffer = (char*)malloc(len);
+						iResult = RecievePacket(socket, recvBuffer, len);
+						server_response *result = (server_response*)recvBuffer;
+						if (result->code == MOVE_HIT)
+						{
+							field.state = 1;
+							my_hits++;
+							printf("%d hits %d\n",socket, my_hits);
+						}
+						else
+						{
+							field.state = -1;
+						}
+						//printf("%d Primio odgovor od servera.\n", socket);
+						PushFront(&oponent_list, field);
+						free(recvBuffer);
+						FSM = 2;
+					}
+				}
+			} while (FSM == 1);
+		}
+
+		if (my_hits == 17)
+			break;
 
 		//prima odgovor
-		int iResult = RecievePacket(socket, (char*)&len, 4);
-		char *recvBuffer = (char*)malloc(len + 1);
-		memset(recvBuffer, 0, 1);
-		iResult = RecievePacket(socket, recvBuffer, len);
-		server_response *result = (server_response*)recvBuffer;
-		if (result->code == MOVE_HIT)
+		if (FSM == 2)
 		{
-			field.state = 1;
-			my_hits++;
-			if (my_hits == 17)
-				break;
-		}
-		else
-		{
-			field.state = -1;
-		}
-		PushFront(&oponent_list, field);
-		free(recvBuffer);
+			fd_set readfds;
+			FD_ZERO(&readfds);
+			FD_SET(socket, &readfds);
+			timeval timeVal;
+			timeVal.tv_sec = 1;
+			timeVal.tv_usec = 0;
+			unsigned long  modee = 1;
+			if (ioctlsocket(socket, FIONBIO, &modee) != 0)
+				printf("ioctlsocket failed with error.");
 
-		iResult = RecievePacket(socket, (char*)&len, 4);
-		char *recvBuffer2 = (char*)malloc(len + 1);
-		memset(recvBuffer, 0, 1);
-		iResult = RecievePacket(socket, recvBuffer2, len);
-		if (searchValue(*head, recvBuffer2[4] - '0', recvBuffer2[5] - 'A') == 2)
-		{
-			oponent_hits++;
-			if (oponent_hits == 17)
-				break;
+			do
+			{
+				FD_SET(socket, &readfds);
+				int result = select(0, &readfds, NULL, NULL, &timeVal);
+				if (result > 0)
+				{
+					if (FD_ISSET(socket, &readfds))
+					{
+						int len;
+						int iResult = RecievePacket(socket, (char*)&len, 4);
+						char *recvBuffer2 = (char*)malloc(len);
+
+						iResult = RecievePacket(socket, recvBuffer2, len);
+						if (searchValue(*head, recvBuffer2[4] - '0', recvBuffer2[5] - 'A') == 2)
+						{
+							oponent_hits++;
+							printf("%d hits %d\n", socket, oponent_hits);
+						}
+						//printf("%d Primio server potez\n",socket);
+						changeState(&(*head), recvBuffer2[4] - '0', recvBuffer2[5] - 'A');
+						free(recvBuffer2);
+						FSM = 0;
+					}
+				}
+			} while (FSM == 2);
 		}
-		changeState(&(*head), recvBuffer2[4] - '0', recvBuffer2[5] - 'A');
-		system("cls");
-		free(recvBuffer2);
+
+		if (oponent_hits == 17)
+			break;
 	}
 
 	ClearList(&oponent_list);

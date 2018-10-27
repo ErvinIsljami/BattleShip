@@ -325,11 +325,6 @@ void changeState(LIST **head, int rowKey, int columnKey)
 
 LIST* get_random_battlefield()
 {
-	//imaces fajl koji se zove number_of_battlefield.txt, u njemu cuvas ukupan broj matrica, ucitas n
-	//uzmes random broj(r) izmedju 1 i n, i koristis sprintf(file_name,"battlefield%d.txt",r);
-	//ucitas tu matricu preko load_battlefield funkcije, prosledis joj ime fajla
-	//vratis tu listu sto ti je vratila funkcija
-
 	int n = 0;
 	srand(time(NULL));
 	char ime[20];
@@ -350,8 +345,6 @@ LIST* get_random_battlefield()
 
 LIST* load_battlefield(char *file_name)
 {
-	//fajl izgleda ovako: row column value
-	//imaces fajlove koji se zovu, battlefield1.txt, battlefield2.txt, battlefield3.txt, battlefield4.tx
 	FILE *fp = safe_fopen(file_name, "r", 404);
 	if (fp == NULL)
 	{
@@ -374,12 +367,6 @@ LIST* load_battlefield(char *file_name)
 
 void save_battlefield(LIST *head)
 {
-	//ucita broj n iz fajla number_of_battlefield.txt, ako ne postoji taj fajl, napravis ga i upises 0
-	//napravis fajl koji se zove sprintf(file_name, "battlefield%d.txt",n+1)
-	//upises u taj fajl matricu(moras da ispostujes redosled row column value)
-	//povecas n za jedan jer si upisao jednu matricu
-	//upises n
-
 	int n = 0;
 	char ime[20];
 
@@ -414,4 +401,69 @@ void save_battlefield(LIST *head)
 	n++;
 	fprintf(fp2, "%d", n);
 	fclose(fp2);
+}
+
+LIST* get_random_battlefield_test()
+{
+	LIST * ret = NULL;
+	FIELD field[17];
+	field[0].row = 8;
+	field[0].column = 0;
+	field[0].state = 2;
+	field[1].row = 9;
+	field[1].column = 0;
+	field[1].state = 2;
+	field[2].row = 7;
+	field[2].column = 2;
+	field[2].state = 2;
+	field[3].row = 7;
+	field[3].column = 3;
+	field[3].state = 2;
+	field[4].row = 7;
+	field[4].column = 4;
+	field[4].state = 2;
+	field[5].row = 0;
+	field[5].column = 9;
+	field[5].state = 2;
+	field[6].row = 1;
+	field[6].column = 9;
+	field[6].state = 2;
+	field[7].row = 2;
+	field[7].column = 9;
+	field[7].state = 2;
+	field[8].row = 3;
+	field[8].column = 0;
+	field[8].state = 2;
+	field[9].row = 3;
+	field[9].column = 1;
+	field[9].state = 2;
+	field[10].row = 3;
+	field[10].column = 2;
+	field[10].state = 2;
+	field[11].row = 3;
+	field[11].column = 3;
+	field[11].state = 2;
+	field[12].row = 1;
+	field[12].column = 7;
+	field[12].state = 2;
+	field[13].row = 2;
+	field[13].column = 7;
+	field[13].state = 2;
+	field[14].row = 3;
+	field[14].column = 7;
+	field[14].state = 2;
+	field[15].row = 4;
+	field[15].column = 7;
+	field[15].state = 2;
+	field[16].row = 5;
+	field[16].column = 7;
+	field[16].state = 2;
+
+
+	for (int i = 0; i < 17; i++)
+	{
+		PushFront(&ret, field[i]);
+	}
+
+	return ret;
 }
